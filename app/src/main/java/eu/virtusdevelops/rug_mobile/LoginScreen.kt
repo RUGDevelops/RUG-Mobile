@@ -30,9 +30,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
-import com.google.gson.Gson
 import eu.virtusdevelops.backendapi.Api
+import eu.virtusdevelops.backendapi.Api.getErrorResponse
 import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.responses.ErrorResponse
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -49,6 +50,7 @@ fun LoginScreen(
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isError by remember { mutableStateOf(false)}
     var passwordVisibility by remember { mutableStateOf(false) }
 
     val modifier = Modifier.padding(5.dp)
@@ -71,8 +73,10 @@ fun LoginScreen(
         TextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text("Email") },
+            placeholder = { Text("Your email here")},
             modifier = modifier,
+            isError = isError,
             leadingIcon = {
                 Icon(Icons.Filled.Person, contentDescription = "Username")
             })
@@ -80,8 +84,10 @@ fun LoginScreen(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
+            placeholder = { Text("Your password here")},
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = modifier,
+            isError = isError,
             leadingIcon = {
                 IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                     Icon(Icons.Filled.Lock, contentDescription = "Toggle password visibility")
@@ -109,16 +115,32 @@ fun LoginScreen(
                         // save user into app state
 
                         withContext(Dispatchers.Main){
-                            navController.navigate(Screen.MainScreen.route)
+                            isError = false
+
+
+                            // navigate without backtrace (so user cant click back and go to login again
+                            navController.navigate(
+                                Screen.MainScreen.route){
+
+                                popUpTo(Screen.LoginScreen.route) { // Make sure this matches your login screen's route
+                                    inclusive = true
+                                }
+
+                            }
+
                         }
                     }else{
-//                        val gson = Gson()
-//                        // display error
-//                        val errorResponse = gson.fromJson(response.errorBody()!!.charStream(), ErrorResponse::class.java)
-//
-//
+                        val error = response.getErrorResponse<ErrorResponse>()
+
+
+
                         withContext(Dispatchers.Main){
-                            Toast.makeText(context, response.code().toString(), Toast.LENGTH_LONG).show()
+                            isError = true
+                            if(error?.errors != null){
+                                Toast.makeText(context, error.errors.toString(), Toast.LENGTH_LONG).show()
+                            }else{
+                                Toast.makeText(context, response.code().toString(), Toast.LENGTH_LONG).show()
+                            }
                         }
                     }
 

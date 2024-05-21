@@ -12,13 +12,11 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 
-//
-//const val BASE_URL = "https://api-d4me-stage.direct4.me"
-//const val API_KEY = "9ea96945-3a37-4638-a5d4-22e89fbc998f"
+
 
 interface ApiRequest {
     @Headers("Content-Type: application/json")
-    @GET("/package_holder/{id}")
+    @GET("package_holder/{id}")
     suspend fun getPackageHolder(@Path("id") id: Int): Response<PackageHolder>
 
     @Headers("Content-Type: application/json")
