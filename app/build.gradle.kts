@@ -64,10 +64,13 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.compose)
-
-    implementation(libs.quickie.bundled) //qr code scanner
+    implementation(libs.gson)
     implementation(libs.retrofit) // API calls library
     implementation(libs.converter.gson)
+
+    implementation(libs.quickie.bundled)
+    implementation(project(":app:backendapi")) //qr code scanner
+
 
 
     testImplementation(libs.junit)

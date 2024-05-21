@@ -1,54 +1,32 @@
 package eu.virtusdevelops.backendapi
+import eu.virtusdevelops.backendapi.requests.LoginRequest
+import eu.virtusdevelops.backendapi.requests.RegisterRequest
+import eu.virtusdevelops.backendapi.responses.LoginResponse
+import eu.virtusdevelops.backendapi.responses.RegisterResponse
 import eu.virtusdevelops.datalib.models.PackageHolder
-import okhttp3.OkHttpClient
+import retrofit2.Response
+
 import retrofit2.http.Body
-import retrofit2.http.Header
+import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
-import java.security.cert.X509Certificate
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
+import retrofit2.http.Path
 
-
-const val BASE_URL = "https://api-d4me-stage.direct4.me"
-const val API_KEY = "9ea96945-3a37-4638-a5d4-22e89fbc998f"
+//
+//const val BASE_URL = "https://api-d4me-stage.direct4.me"
+//const val API_KEY = "9ea96945-3a37-4638-a5d4-22e89fbc998f"
 
 interface ApiRequest {
     @Headers("Content-Type: application/json")
-    @POST("/sandbox/v1/Access/openbox")
-    suspend fun getApiData(@Body body: PackageHolder, @Header("Authorization") auth: String = "Bearer $API_KEY"): PackageHolder
+    @GET("/package_holder/{id}")
+    suspend fun getPackageHolder(@Path("id") id: Int): Response<PackageHolder>
 
+    @Headers("Content-Type: application/json")
+    @POST("auth/register")
+    suspend fun register(@Body registerRequest: RegisterRequest): Response<RegisterResponse>
 
-    // todo
-    
+    @Headers("Content-Type: application/json")
+    @POST("auth/login")
+    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
-}
-
-
-fun getUnsafeOkHttpClient(): OkHttpClient {
-    try {
-        // Create a trust manager that does not validate certificate chains
-        val trustAllCerts: Array<TrustManager> = arrayOf(object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = Unit
-            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) = Unit
-            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-        })
-
-        // Install the all-trusting trust manager
-        val sslContext = SSLContext.getInstance("SSL")
-        sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-
-        // Create an ssl socket factory with our all-trusting manager
-        val sslSocketFactory = sslContext.socketFactory
-
-        val builder = OkHttpClient.Builder()
-        builder.sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-        builder.hostnameVerifier(HostnameVerifier { _, _ -> true })
-
-        return builder.build()
-    } catch (e: Exception) {
-        throw RuntimeException(e)
-    }
 }

@@ -9,4 +9,7 @@ java {
 }
 dependencies {
     implementation(project(":app:datalib"))
+    implementation(libs.gson)
+    implementation(libs.retrofit) // API calls library
+    implementation(libs.converter.gson)
 }

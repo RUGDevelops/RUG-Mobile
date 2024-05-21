@@ -3,7 +3,6 @@ package eu.virtusdevelops.rug_mobile
 import android.media.MediaPlayer
 import android.util.Base64
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,12 +35,6 @@ import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
@@ -128,32 +121,7 @@ private fun playBase64Wav(base64Wav: String) {
     mediaPlayer.start()
 }
 
-private fun makeApiRequest(box: Box) {
-    println(box)
-    val api = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .client(getUnsafeOkHttpClient())
-        .build()
-        .create(ApiRequest::class.java)
 
-    GlobalScope.launch(Dispatchers.IO) {
-        try {
-            val response = api.getApiData(box)
-            Log.d("API_DATA", response.data) // Print to console
-            playBase64Wav(response.data) // Play the audio
-
-            withContext(Dispatchers.Main) {
-                //Toast.makeText(this@MainActivity, "Playing sound...", Toast.LENGTH_LONG).show()
-            }
-        } catch (e: Exception) {
-            Log.d(
-                "API_ERROR",
-                "Failed to make API request or play file, with error: ${e.message}, box: $box"
-            ) // Print error to console
-        }
-    }
-}
 
 private fun parseQrResult(qrData: String) {
     if(qrData.isEmpty()) return
@@ -180,20 +148,20 @@ private fun parseQrResult(qrData: String) {
                 Log.d("URL_COMPONENT", component)
             }
 
-            makeApiRequest(
-                Box(
-                    deliveryId = deliveryId,
-                    boxId = boxId.toString().trimStart('0').toInt(),
-                    tokenFormat = 2,
-                    latitude = latitude,
-                    longitude = longitude,
-                    qrCodeInfo = "string",
-                    terminalSeed = terminalSeed,
-                    isMultibox = false,
-                    doorIndex = doorIndex,
-                    addAccessLog = true
-                )
-            )
+//            makeApiRequest(
+//                Box(
+//                    deliveryId = deliveryId,
+//                    boxId = boxId.toString().trimStart('0').toInt(),
+//                    tokenFormat = 2,
+//                    latitude = latitude,
+//                    longitude = longitude,
+//                    qrCodeInfo = "string",
+//                    terminalSeed = terminalSeed,
+//                    isMultibox = false,
+//                    doorIndex = doorIndex,
+//                    addAccessLog = true
+//                )
+//            )
         } else {
             Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
         }

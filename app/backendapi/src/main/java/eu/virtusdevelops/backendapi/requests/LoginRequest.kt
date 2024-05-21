@@ -1,9 +1,6 @@
 package eu.virtusdevelops.backendapi.requests
 
-data class RegisterRequest(
+data class LoginRequest(
     val email: String,
-    val firstName: String,
-    val lastName: String,
-    val password: String,
-    val repeatPassword: String
+    val password: String
 )

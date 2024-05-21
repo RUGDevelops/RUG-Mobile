@@ -1,5 +1,6 @@
 package eu.virtusdevelops.rug_mobile
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -29,7 +31,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
+import eu.virtusdevelops.backendapi.Api
+import eu.virtusdevelops.backendapi.requests.LoginRequest
+import eu.virtusdevelops.backendapi.responses.ErrorResponse
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LoginScreen(
     navController: NavController
@@ -76,9 +89,47 @@ fun LoginScreen(
             }
         )
         Spacer(modifier = modifier.fillMaxSize(0.7f))
+        val context = LocalContext.current
         Button(
             onClick = {
-                navController.navigate(Screen.MainScreen.route)
+                // Development mode bypass.
+                if(password.isEmpty()){
+                    navController.navigate(Screen.MainScreen.route)
+                    return@Button
+                }
+
+
+                GlobalScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+                    val response = Api.api.login(LoginRequest(
+                        username,
+                        password
+                    ))
+
+                    if(response.isSuccessful){
+                        // save user into app state
+
+                        withContext(Dispatchers.Main){
+                            navController.navigate(Screen.MainScreen.route)
+                        }
+                    }else{
+//                        val gson = Gson()
+//                        // display error
+//                        val errorResponse = gson.fromJson(response.errorBody()!!.charStream(), ErrorResponse::class.java)
+//
+//
+                        withContext(Dispatchers.Main){
+                            Toast.makeText(context, response.code().toString(), Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                }
+
+
+
+
+
+
+
             },
             modifier = modifier,
             colors = ButtonDefaults.buttonColors(
@@ -88,6 +139,14 @@ fun LoginScreen(
         }
     }
 }
+
+
+val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
+    throwable.printStackTrace()
+}
+
+
+
 
 @Preview
 @Composable
