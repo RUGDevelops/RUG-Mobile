@@ -1,4 +1,4 @@
-package com.example.rug_mobile
+package eu.virtusdevelops.rug_mobile
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example.rug_mobile
+package eu.virtusdevelops.rug_mobile
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -36,7 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.rug_mobile.ui.theme.RUGMobileTheme
+import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
 import io.github.g00fy2.quickie.ScanQRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

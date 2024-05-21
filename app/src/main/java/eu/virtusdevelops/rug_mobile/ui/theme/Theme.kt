@@ -1,4 +1,4 @@
-package com.example.rug_mobile.ui.theme
+package eu.virtusdevelops.rug_mobile.ui.theme
 
 import android.app.Activity
 import android.os.Build

@@ -1,7 +1,6 @@
-package com.example.rug_mobile
+package eu.virtusdevelops.rug_mobile
 import okhttp3.OkHttpClient
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
