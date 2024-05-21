@@ -21,3 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "RUG-Mobile"
 include(":app")
+include(":app:datalib")
+include(":app:backendapi")

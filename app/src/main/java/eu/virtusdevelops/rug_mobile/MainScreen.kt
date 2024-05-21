@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
+import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -51,9 +52,11 @@ fun MainScreen(
     navController: NavController
 ) {
     var presses by remember { mutableIntStateOf(0) }
-    var scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
+    val scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
         result.let {
             var qrData = result.toString()
+            if(result is QRResult.QRUserCanceled) return@let
+
             Log.d("RESULT_DATA", qrData)
             parseQrResult(qrData)
         }
@@ -153,6 +156,7 @@ private fun makeApiRequest(box: Box) {
 }
 
 private fun parseQrResult(qrData: String) {
+    if(qrData.isEmpty()) return
     val rawValueStartIndex = qrData.indexOf("rawValue=") + "rawValue=".length
     val rawValueEndIndex = qrData.indexOf(")", startIndex = rawValueStartIndex)
     val rawValue = qrData.substring(rawValueStartIndex, rawValueEndIndex)

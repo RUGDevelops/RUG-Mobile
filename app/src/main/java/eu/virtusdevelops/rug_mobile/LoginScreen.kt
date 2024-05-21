@@ -38,7 +38,7 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
 
-    var modifier = Modifier.padding(5.dp)
+    val modifier = Modifier.padding(5.dp)
 
     Column(
         modifier = modifier
@@ -57,7 +57,7 @@ fun LoginScreen(
         Spacer(modifier = (modifier.fillMaxSize(0.1f)))
         TextField(
             value = username,
-            onValueChange = { password = it },
+            onValueChange = { username = it },
             label = { Text("Username") },
             modifier = modifier,
             leadingIcon = {
