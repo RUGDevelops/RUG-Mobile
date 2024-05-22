@@ -1,4 +1,4 @@
-package eu.virtusdevelops.rug_mobile
+package eu.virtusdevelops.rug_mobile.screens
 
 import android.media.MediaPlayer
 import android.util.Base64

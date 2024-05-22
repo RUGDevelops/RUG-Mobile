@@ -27,4 +27,7 @@ interface ApiRequest {
     @POST("auth/login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
+    @Headers("Content-Type: application/json")
+    @POST("auth/login")
+    suspend fun logout(): Response<LoginResponse>
 }

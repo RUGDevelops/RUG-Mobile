@@ -69,7 +69,8 @@ dependencies {
     implementation(libs.converter.gson)
 
     implementation(libs.quickie.bundled)
-    implementation(project(":app:backendapi")) //qr code scanner
+    implementation(project(":app:backendapi"))
+    implementation(project(":app:datalib")) //qr code scanner
 
 
 

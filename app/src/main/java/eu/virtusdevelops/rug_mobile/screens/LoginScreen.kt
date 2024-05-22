@@ -1,16 +1,17 @@
-package eu.virtusdevelops.rug_mobile
+package eu.virtusdevelops.rug_mobile.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,28 +31,23 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.rememberNavController
-import eu.virtusdevelops.backendapi.Api
-import eu.virtusdevelops.backendapi.Api.getErrorResponse
-import eu.virtusdevelops.backendapi.requests.LoginRequest
-import eu.virtusdevelops.backendapi.responses.ErrorResponse
+import eu.virtusdevelops.rug_mobile.viewModels.LocalUserState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 @OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false)}
     var passwordVisibility by remember { mutableStateOf(false) }
+    val viewModel = LocalUserState.current
+
 
     val modifier = Modifier.padding(5.dp)
 
@@ -97,67 +93,67 @@ fun LoginScreen(
         Spacer(modifier = modifier.fillMaxSize(0.7f))
         val context = LocalContext.current
         Button(
+            shape = RoundedCornerShape(10.dp),
             onClick = {
-                // Development mode bypass.
-                if(password.isEmpty()){
-                    navController.navigate(Screen.MainScreen.route)
-                    return@Button
-                }
+                viewModel.login(username, password)
 
 
-                GlobalScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-                    val response = Api.api.login(LoginRequest(
-                        username,
-                        password
-                    ))
-
-                    if(response.isSuccessful){
-                        // save user into app state
-
-                        withContext(Dispatchers.Main){
-                            isError = false
-
-
-                            // navigate without backtrace (so user cant click back and go to login again
-                            navController.navigate(
-                                Screen.MainScreen.route){
-
-                                popUpTo(Screen.LoginScreen.route) { // Make sure this matches your login screen's route
-                                    inclusive = true
-                                }
-
-                            }
-
-                        }
-                    }else{
-                        val error = response.getErrorResponse<ErrorResponse>()
-
-
-
-                        withContext(Dispatchers.Main){
-                            isError = true
-                            if(error?.errors != null){
-                                Toast.makeText(context, error.errors.toString(), Toast.LENGTH_LONG).show()
-                            }else{
-                                Toast.makeText(context, response.code().toString(), Toast.LENGTH_LONG).show()
-                            }
-                        }
-                    }
-
-                }
-
-
-
-
-
-
-
+//                GlobalScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
+//                    val response = Api.api.login(LoginRequest(
+//                        username,
+//                        password
+//                    ))
+//
+//                    if(response.isSuccessful){
+//                        // save user into app state
+//
+//                        withContext(Dispatchers.Main){
+//                            isError = false
+//
+//
+//                            // navigate without backtrace (so user cant click back and go to login again
+//                            navController.navigate(
+//                                Screen.MainScreen.route){
+//
+//                                popUpTo(Screen.LoginScreen.route) { // Make sure this matches your login screen's route
+//                                    inclusive = true
+//                                }
+//
+//                            }
+//
+//                        }
+//                    }else{
+//                        val error = response.getErrorResponse<ErrorResponse>()
+//
+//
+//
+//                        withContext(Dispatchers.Main){
+//                            isError = true
+//                            if(error?.errors != null){
+//                                Toast.makeText(context, error.errors.toString(), Toast.LENGTH_LONG).show()
+//                            }else{
+//                                Toast.makeText(context, response.code().toString(), Toast.LENGTH_LONG).show()
+//                            }
+//                        }
+//                    }
+//
+//                }
             },
             modifier = modifier,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary)) {
-            Text("Login")
+
+            if(viewModel.isBusy){
+                CircularProgressIndicator()
+            }else if(viewModel.isLoggedIn){
+                navController.navigate(Screen.MainScreen.route) {
+                    popUpTo(navController.graph.id)
+                }
+            }else{
+                Text("Login")
+            }
+
         }
     }
 }
