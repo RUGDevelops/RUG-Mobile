@@ -67,6 +67,9 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.retrofit) // API calls library
     implementation(libs.converter.gson)
+    implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.androidx.datastore.preferences)
+
 
     implementation(libs.quickie.bundled)
     implementation(project(":app:backendapi"))

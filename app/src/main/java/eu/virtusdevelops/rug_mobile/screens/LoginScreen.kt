@@ -37,14 +37,12 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun LoginScreen(
     navController: NavController,
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(false)}
     var passwordVisibility by remember { mutableStateOf(false) }
     val viewModel = LocalUserState.current
 
@@ -72,7 +70,7 @@ fun LoginScreen(
             label = { Text("Email") },
             placeholder = { Text("Your email here")},
             modifier = modifier,
-            isError = isError,
+            isError = viewModel.error != null,
             leadingIcon = {
                 Icon(Icons.Filled.Person, contentDescription = "Username")
             })
@@ -83,7 +81,7 @@ fun LoginScreen(
             placeholder = { Text("Your password here")},
             visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = modifier,
-            isError = isError,
+            isError = viewModel.error != null,
             leadingIcon = {
                 IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
                     Icon(Icons.Filled.Lock, contentDescription = "Toggle password visibility")
@@ -96,48 +94,6 @@ fun LoginScreen(
             shape = RoundedCornerShape(10.dp),
             onClick = {
                 viewModel.login(username, password)
-
-
-//                GlobalScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
-//                    val response = Api.api.login(LoginRequest(
-//                        username,
-//                        password
-//                    ))
-//
-//                    if(response.isSuccessful){
-//                        // save user into app state
-//
-//                        withContext(Dispatchers.Main){
-//                            isError = false
-//
-//
-//                            // navigate without backtrace (so user cant click back and go to login again
-//                            navController.navigate(
-//                                Screen.MainScreen.route){
-//
-//                                popUpTo(Screen.LoginScreen.route) { // Make sure this matches your login screen's route
-//                                    inclusive = true
-//                                }
-//
-//                            }
-//
-//                        }
-//                    }else{
-//                        val error = response.getErrorResponse<ErrorResponse>()
-//
-//
-//
-//                        withContext(Dispatchers.Main){
-//                            isError = true
-//                            if(error?.errors != null){
-//                                Toast.makeText(context, error.errors.toString(), Toast.LENGTH_LONG).show()
-//                            }else{
-//                                Toast.makeText(context, response.code().toString(), Toast.LENGTH_LONG).show()
-//                            }
-//                        }
-//                    }
-//
-//                }
             },
             modifier = modifier,
             colors = ButtonDefaults.buttonColors(
@@ -157,13 +113,6 @@ fun LoginScreen(
         }
     }
 }
-
-
-val coroutineExceptionHandler = CoroutineExceptionHandler{_, throwable ->
-    throwable.printStackTrace()
-}
-
-
 
 
 @Preview

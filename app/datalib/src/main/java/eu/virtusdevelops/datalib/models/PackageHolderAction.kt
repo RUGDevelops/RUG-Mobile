@@ -1,3 +1,8 @@
 package eu.virtusdevelops.datalib.models
 
-data class PackageHolderAction()
+import java.util.Date
+
+data class PackageHolderAction(
+    val action: String,
+    val date: Date
+)
