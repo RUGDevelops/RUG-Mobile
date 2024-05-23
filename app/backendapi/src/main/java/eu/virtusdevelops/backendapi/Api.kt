@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object Api {
 
     // todo: change this
-    private const val BASE_URL = "http://192.168.1.69:8080/api/v1/"
+    private const val BASE_URL = "https://rug-be.virtus.lol/api/v1/"
 
 
     val api: ApiRequest by lazy {
