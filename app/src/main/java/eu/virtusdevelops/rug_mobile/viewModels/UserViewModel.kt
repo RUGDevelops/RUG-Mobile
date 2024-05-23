@@ -1,5 +1,6 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
+import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -21,7 +22,10 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class UserViewModel (private val context: Context)  : ViewModel() {
+class UserViewModel (
+     private val application: Application
+)  : ViewModel() {
+
     var isLoggedIn by mutableStateOf(false)
     var isBusy by mutableStateOf(true)
     var user : User? by mutableStateOf(null)
@@ -36,8 +40,8 @@ class UserViewModel (private val context: Context)  : ViewModel() {
     private val VERIFIED_PATH = booleanPreferencesKey("is_verified")
 
     init {
+        isBusy = true
         viewModelScope.launch {
-            isBusy = true
             loadUser()
             isBusy = false
         }
@@ -79,6 +83,7 @@ class UserViewModel (private val context: Context)  : ViewModel() {
                     if(data != null){
                         saveUserPreferences(true, email, data.firstname, data.lastname, cookie, data.verified)
                         user = User(data.email, data.firstname, data.lastname, data.verified)
+                        Api.setCookie(cookie)
                     }
 
                 } else {
@@ -88,8 +93,8 @@ class UserViewModel (private val context: Context)  : ViewModel() {
                     if(errorResponse != null){
                         error = errorResponse.errors.toString()
                     }
-
                     saveUserPreferences(false, "", "", "", "", false)
+                    Api.setCookie("")
                 }
 
             }catch (ex : Exception){
@@ -106,7 +111,6 @@ class UserViewModel (private val context: Context)  : ViewModel() {
     }
 
     fun logout() {
-
         viewModelScope.launch {
             isBusy = true
             try{
@@ -126,10 +130,8 @@ class UserViewModel (private val context: Context)  : ViewModel() {
 
     private suspend fun loadUser() {
         try {
-            println("Loading!")
-            val preferences = context.dataStore.data
+            val preferences = application.dataStore.data
                 .map { preferences ->
-                    println("Okay constructing!")
                     UserPreferences(
                         preferences[LOGGED_IN] ?: false,
                         preferences[EMAIL_KEY] ?: "",
@@ -138,18 +140,12 @@ class UserViewModel (private val context: Context)  : ViewModel() {
                         preferences[COOKIE_PATH] ?: "",
                         preferences[VERIFIED_PATH] ?: false
                     )
-                }.firstOrNull()  // Collect the first value emitted by the flow
-
-
+                }.firstOrNull()
             if(preferences != null){
                 user = User(preferences.email, preferences.firstName, preferences.lastName, preferences.verified)
                 isLoggedIn = preferences.isLoggedIn
                 Api.setCookie(preferences.cookie)
-                println("Finished loading!")
             }
-
-
-
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -157,7 +153,7 @@ class UserViewModel (private val context: Context)  : ViewModel() {
 
 
     private suspend fun saveUserPreferences(loggedIn: Boolean, email: String, firstName: String, lastName: String, cookie: String, verified: Boolean) {
-        context.dataStore.edit { preferences ->
+        application.dataStore.edit { preferences ->
             preferences[LOGGED_IN] = loggedIn
             preferences[EMAIL_KEY] = email
             preferences[NAME_KEY] = firstName

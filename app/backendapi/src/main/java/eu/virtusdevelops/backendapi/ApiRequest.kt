@@ -28,6 +28,12 @@ interface ApiRequest {
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
     @Headers("Content-Type: application/json")
-    @POST("auth/login")
+    @POST("auth/logout")
     suspend fun logout(): Response<LoginResponse>
+
+
+    @Headers("Content-Type: application/json")
+    @GET("package_holder")
+    suspend fun getPackageHolders(): Response<List<PackageHolder>>
+
 }

@@ -51,6 +51,8 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -71,9 +73,11 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
 
+
     implementation(libs.quickie.bundled)
     implementation(project(":app:backendapi"))
-    implementation(project(":app:datalib")) //qr code scanner
+    implementation(project(":app:datalib"))
+    implementation(libs.androidx.runtime.livedata) //qr code scanner
 
 
 

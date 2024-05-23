@@ -11,6 +11,7 @@ object Api {
 
     // todo: change this
     private const val BASE_URL = "https://rug-be.virtus.lol/api/v1/"
+//    private const val BASE_URL = "http://192.168.1.69:8080/api/v1/"
     private var cookieValue: String? = null
 
 
@@ -30,7 +31,7 @@ object Api {
 
     private fun getOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(CookieInterceptor("auth_sid", cookieValue))
+            .addInterceptor(CookieInterceptor("auth_sid"))
             .build()
     }
 
@@ -48,11 +49,12 @@ object Api {
         return null
     }
 
-    class CookieInterceptor(private val cookieName: String?, private val cookieValue: String?) : Interceptor {
+    class CookieInterceptor(private val cookieName: String?) : Interceptor {
         override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
             val request = chain.request().newBuilder()
             if (cookieName != null && cookieValue != null) {
                 request.addHeader("Cookie", "$cookieName=$cookieValue")
+                println("Cookie: $cookieValue")
             }
             return chain.proceed(request.build())
         }
