@@ -1,18 +1,14 @@
 package eu.virtusdevelops.rug_mobile.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import eu.virtusdevelops.rug_mobile.screens.MainScreen
-import eu.virtusdevelops.rug_mobile.screens.LoginScreen
 import eu.virtusdevelops.rug_mobile.screens.Screen
 import eu.virtusdevelops.rug_mobile.screens.SplashScreen
-import eu.virtusdevelops.rug_mobile.viewModels.LocalUserState
+import eu.virtusdevelops.rug_mobile.screens.LoginScreen
+import eu.virtusdevelops.rug_mobile.screens.RegisterScreen
 
 @Composable
 fun SetupNavGraph(
@@ -39,6 +35,9 @@ fun SetupNavGraph(
         }
         composable(Screen.SplashScreen.route){
             SplashScreen(navController)
+        }
+        composable(Screen.RegisterScreen.route){
+            RegisterScreen(navController)
         }
     }
 }
