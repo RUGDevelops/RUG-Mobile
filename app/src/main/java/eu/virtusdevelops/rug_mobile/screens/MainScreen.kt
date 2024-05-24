@@ -3,6 +3,7 @@ package eu.virtusdevelops.rug_mobile.screens
 import android.media.MediaPlayer
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -76,7 +77,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun MainScreen(
     navController: NavController
@@ -103,6 +106,11 @@ fun MainScreen(
         packageHolderViewModel.load()
     }
 
+    if (!viewModel.isLoggedIn) {
+        navController.navigate(Screen.LoginScreen.route) {
+            popUpTo(navController.graph.id)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -115,7 +123,14 @@ fun MainScreen(
                     Text("Package holders")
                 },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        viewModel.logout()
+                        if (!viewModel.isLoggedIn) {
+                            navController.navigate(Screen.LoginScreen.route) {
+                                popUpTo(navController.graph.id)
+                            }
+                        }
+                    }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Menu")
                     }
                 }
@@ -150,9 +165,6 @@ fun MainScreen(
                 } else {
                     ListOfPackageHolders(packageHolders)
                 }
-
-
-
             }
         }
         Box(

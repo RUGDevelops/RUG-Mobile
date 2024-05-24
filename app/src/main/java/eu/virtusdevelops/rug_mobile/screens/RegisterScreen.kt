@@ -1,5 +1,6 @@
 package eu.virtusdevelops.rug_mobile.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,11 +35,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import eu.virtusdevelops.rug_mobile.viewModels.LocalUserState
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 fun RegisterScreen(
     navController: NavController
@@ -47,10 +51,13 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+    val viewModel = LocalUserState.current
 
     val modifier = Modifier
         .padding(5.dp)
         .fillMaxWidth()
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -140,6 +147,10 @@ fun RegisterScreen(
         ) {
             Button(
                 onClick = {
+                    viewModel.register(email, firstName, lastName, password, repeatPassword, onSuccess = {
+                        Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
+                        navController.navigate(Screen.SplashScreen.route)
+                    })
                 },
                 modifier = modifier
                     .height(50.dp),
@@ -148,6 +159,11 @@ fun RegisterScreen(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
+                if (viewModel.isBusy) {
+                    CircularProgressIndicator()
+                } else {
+                    Text("Register")
+                }
                 Text("Register")
             }
 

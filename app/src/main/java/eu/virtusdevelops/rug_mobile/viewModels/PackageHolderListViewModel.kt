@@ -21,8 +21,6 @@ class PackageHolderListViewModel(
     private val _packageHolders = MutableLiveData<List<PackageHolder>>()
     val packageHolders: LiveData<List<PackageHolder>> get() = _packageHolders
 
-
-
     fun load(){
         viewModelScope.launch {
             isBusy = true

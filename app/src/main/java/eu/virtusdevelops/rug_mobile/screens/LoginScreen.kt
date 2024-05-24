@@ -99,9 +99,6 @@ fun LoginScreen(
             )
         }
 
-
-        val context = LocalContext.current
-
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
