@@ -51,7 +51,7 @@ class UserViewModel(
     }
 
     fun register(email: String, password: String, firstName: String, lastName: String, repeatPassword: String, onSuccess: () -> Unit) {
-        if (password.isEmpty()) {
+        if (password.isEmpty() && repeatPassword.isEmpty()) {
             isLoggedIn = true
             return
         }
@@ -126,8 +126,10 @@ class UserViewModel(
                     )
                 )
 
-
                 if (response.isSuccessful) {
+                    //2FA face recognition
+
+
                     isLoggedIn = true
                     val data = response.body()
 
@@ -136,7 +138,6 @@ class UserViewModel(
                     if (cookies?.contains("auth_sid") == true) {
                         cookie = cookies.split("=")[1].split(";")[0]
                     }
-
 
                     if (data != null) {
                         saveUserPreferences(

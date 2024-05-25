@@ -3,15 +3,20 @@ package eu.virtusdevelops.rug_mobile.screens
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,10 +26,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,11 +42,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.viewModels.LocalUserState
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun RegisterScreen(
@@ -50,14 +62,20 @@ fun RegisterScreen(
     var lastName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
+
     var passwordVisibility by remember { mutableStateOf(false) }
     val viewModel = LocalUserState.current
+    var passwordError by remember { mutableStateOf(PasswordValidationState()) }
 
     val modifier = Modifier
         .padding(5.dp)
         .fillMaxWidth()
 
     val context = LocalContext.current
+
+    LaunchedEffect(password, repeatPassword) {
+        passwordError = PasswordValidator.execute(password, repeatPassword)
+    }
 
     Column(
         modifier = Modifier
@@ -138,7 +156,35 @@ fun RegisterScreen(
                     }
                 }
             )
+//            if (!passwordError.successful) {
+//                if (!passwordError.matching) {
+//                    Text("Passwords do not match",
+//                        color = if(!passwordError.matching) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
+//                }
+//                if (!passwordError.hasUpperCaseLetter) {
+//                    Text("Password must contain at least one uppercase letter", color = MaterialTheme.colorScheme.error)
+//                }
+//                if (!passwordError.hasLowerCaseLetter) {
+//                    Text("Password must contain at least one lowercase letter", color = MaterialTheme.colorScheme.error)
+//                }
+//                if (!passwordError.hasDigit) {
+//                    Text("Password must contain at least one digit", color = MaterialTheme.colorScheme.error)
+//                }
+//                if (!passwordError.hasSpecialCharacter) {
+//                    Text("Password must contain at least one special character", color = MaterialTheme.colorScheme.error)
+//                }
+//            }
+        }
 
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = modifier
+        ) {
+            PasswordValidationRow("Passwords match", passwordError.matching)
+            PasswordValidationRow("Contains uppercase letter", passwordError.hasUpperCaseLetter)
+            PasswordValidationRow("Contains lowercase letter", passwordError.hasLowerCaseLetter)
+            PasswordValidationRow("Contains digit", passwordError.hasDigit)
+            PasswordValidationRow("Contains special character", passwordError.hasSpecialCharacter)
         }
 
         Column(
@@ -146,12 +192,14 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Button(
+                shape = RoundedCornerShape(10.dp),
                 onClick = {
                     viewModel.register(email, firstName, lastName, password, repeatPassword, onSuccess = {
                         Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
                         navController.navigate(Screen.SplashScreen.route)
                     })
                 },
+                enabled = passwordError.successful,
                 modifier = modifier
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -164,7 +212,6 @@ fun RegisterScreen(
                 } else {
                     Text("Register")
                 }
-                Text("Register")
             }
 
             ClickableText(
@@ -175,10 +222,30 @@ fun RegisterScreen(
                     navController.navigate(Screen.LoginScreen.route)
                 })
         }
-
     }
 }
 
+@Composable
+fun PasswordValidationRow(errorMessage: String, check: Boolean) {
+    val icon = if (!check) Icons.Rounded.Clear else Icons.Rounded.Check
+    val color = if (!check) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+
+    Row (
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Icon(
+            icon,
+            contentDescription = "Password validation",
+            tint = color
+        )
+        Spacer(modifier = Modifier.padding(5.dp))
+        Text(
+            text = errorMessage,
+            color = color
+        )
+    }
+}
 @Preview
 @Composable
 fun PreviewRegisterView() {
