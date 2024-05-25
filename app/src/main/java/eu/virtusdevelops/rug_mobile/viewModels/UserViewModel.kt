@@ -33,7 +33,6 @@ class UserViewModel(
     var user: User? by mutableStateOf(null)
     var error: String? by mutableStateOf(null)
 
-
     private val LOGGED_IN = booleanPreferencesKey("is_logged_in")
     private val EMAIL_KEY = stringPreferencesKey("user_email")
     private val NAME_KEY = stringPreferencesKey("user_first_name")
@@ -174,19 +173,18 @@ class UserViewModel(
         }
     }
 
-    fun logout() {
+    fun logout(onSuccess: () -> Unit) {
         viewModelScope.launch {
             isBusy = true
             try {
-                val response = Api.api.logout()
+                //val response = Api.api.logout()
 
-                if (response.isSuccessful) {
-                    isLoggedIn = false
-                    user = null
-                    saveUserPreferences(false, "", "", "", "", false)
-                    Api.setCookie("")
-                    loadUser()
-                }
+                isLoggedIn = false
+                user = null
+                saveUserPreferences(false, "", "", "", "", false)
+                Api.setCookie("")
+                loadUser()
+                onSuccess()
             } catch (ex: Exception) {
                 ex.printStackTrace()
             } finally {

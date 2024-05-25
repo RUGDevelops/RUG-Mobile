@@ -124,7 +124,11 @@ fun MainScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-                        viewModel.logout()
+                        viewModel.logout(onSuccess = {
+                            navController.navigate(Screen.SplashScreen.route) {
+                                popUpTo(navController.graph.id)
+                            }
+                        })
                         if (!viewModel.isLoggedIn) {
                             navController.navigate(Screen.LoginScreen.route) {
                                 popUpTo(navController.graph.id)

@@ -48,12 +48,17 @@ fun LoginScreen(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
+
     var passwordVisibility by remember { mutableStateOf(false) }
+    var fieldsError by remember { mutableStateOf(false) }
+
     val viewModel = LocalUserState.current
 
     val modifier = Modifier
         .padding(5.dp)
         .fillMaxWidth()
+
+    fieldsError = username.isEmpty() && password.isEmpty()
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -98,6 +103,12 @@ fun LoginScreen(
                     }
                 }
             )
+            if (fieldsError) {
+                Text(
+                    "Fields must not be empty",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
 
         Column(

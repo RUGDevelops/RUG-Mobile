@@ -1,4 +1,4 @@
-package eu.virtusdevelops.rug_mobile.screens
+package eu.virtusdevelops.rug_mobile.passwordValidation
 
 data class PasswordValidationState(
     val matching: Boolean = false,
