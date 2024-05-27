@@ -57,7 +57,7 @@ fun LoginScreen(
         .padding(5.dp)
         .fillMaxWidth()
 
-    fieldsError = username.isEmpty() && password.isEmpty()
+    isError = username.isEmpty() && password.isEmpty()
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -102,7 +102,7 @@ fun LoginScreen(
                     }
                 }
             )
-            if (fieldsError) {
+            if (isError) {
                 Text(
                     "Fields must not be empty",
                     color = MaterialTheme.colorScheme.error

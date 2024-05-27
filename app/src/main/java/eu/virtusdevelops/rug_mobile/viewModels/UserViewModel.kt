@@ -53,6 +53,17 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             //saveUserPreferences(false, "", "", "", "", false)
             loadUser()
+
+            // validate login state on backend?
+            val response = api.getPackageHolders()
+            if(!response.isSuccessful){
+
+                if(response.code() == 401){
+                    isLoggedIn = false
+                    val tempUser = user ?: User("", "", "", false)
+                    saveUserPreferences(false, tempUser.email, tempUser.firstName, tempUser.lastName, "", false)
+                }
+            }
             isBusy = false
         }
     }
