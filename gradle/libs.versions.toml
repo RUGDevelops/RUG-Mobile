@@ -4,26 +4,29 @@ activity = "1.9.0"
 agp = "8.4.1"
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
-converterGson = "2.9.0"
+converterGson = "2.11.0"
 converterGsonVersion = "latest.version"
 datastorePreferences = "1.1.1"
 foundation = "1.6.7"
 gson = "2.11.0"
-kotlin = "1.9.0"
-coreKtx = "1.10.1"
+hiltAndroid = "2.51.1"
+hiltCompiler = "1.2.0"
+kotlin = "2.0.0"
+coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.6.1"
-activityCompose = "1.8.0"
-composeBom = "2023.08.00"
+lifecycleRuntimeKtx = "2.8.0"
+activityCompose = "1.9.0"
+composeBom = "2024.05.00"
 material = "1.12.0"
 materialVersion = "1.6.7"
 navigationCompose = "2.7.7"
 quickieBundled = "1.8.0"
-retrofit = "2.9.0"
+retrofit = "2.11.0"
 jetbrainsKotlinJvm = "1.9.0"
 runtimeLivedata = "1.6.7"
+uiTextGoogleFonts = "1.6.7"
 
 [libraries]
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
@@ -34,10 +37,14 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferences" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCompiler" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
-converter-gson-vlatestversion = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGsonVersion" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -56,9 +63,11 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 quickie-bundled = { module = "io.github.g00fy2.quickie:quickie-bundled", version.ref = "quickieBundled" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 

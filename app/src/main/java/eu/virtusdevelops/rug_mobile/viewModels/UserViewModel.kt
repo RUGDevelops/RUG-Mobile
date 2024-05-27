@@ -12,20 +12,28 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.backendapi.Api
 import eu.virtusdevelops.backendapi.Api.getErrorResponse
+import eu.virtusdevelops.backendapi.ApiRequest
 import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
 import eu.virtusdevelops.backendapi.responses.ErrorResponse
 import eu.virtusdevelops.datalib.models.User
+import eu.virtusdevelops.rug_mobile.RUGApplication
 import eu.virtusdevelops.rug_mobile.dataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserViewModel(
-    private val application: Application
+
+@HiltViewModel
+class UserViewModel @Inject constructor(
+    private val application: Application,
+    private val api: ApiRequest,
+    private val apiObject: Api
 ) : ViewModel() {
 
     var isLoggedIn by mutableStateOf(false)
@@ -60,7 +68,7 @@ class UserViewModel(
             error = null
 
             try {
-                val response = Api.api.register(
+                val response = api.register(
                     RegisterRequest(
                         email,
                         password,
@@ -72,27 +80,17 @@ class UserViewModel(
 
                 if (response.isSuccessful) {
                     isLoggedIn = false
-                    val data = response.body()
-
-                    val cookies = response.headers().get("Set-Cookie")
-                    var cookie = ""
-                    if (cookies?.contains("auth_sid") == true) {
-                        cookie = cookies.split("=")[1].split(";")[0]
-                    }
-
-                    if (data != null) {
-                        onSuccess()
-                    }
-
+                    onSuccess()
                 } else {
                     isLoggedIn = false
 
                     val errorResponse = response.getErrorResponse<ErrorResponse>()
-                    if (errorResponse != null) {
+                    if(errorResponse != null){
                         error = errorResponse.errors.toString()
+                    }else{
+                        error = ""
                     }
-                    saveUserPreferences(false, "", "", "", "", false)
-                    Api.setCookie("")
+
                 }
 
             } catch (ex: Exception) {
@@ -118,7 +116,7 @@ class UserViewModel(
 
             try {
 
-                val response = Api.api.login(
+                val response = api.login(
                     LoginRequest(
                         email,
                         password
@@ -148,7 +146,7 @@ class UserViewModel(
                             data.verified
                         )
                         user = User(data.email, data.firstname, data.lastname, data.verified)
-                        Api.setCookie(cookie)
+                        apiObject.setCookie(cookie)
                     }
 
                 } else {
@@ -157,9 +155,16 @@ class UserViewModel(
                     val errorResponse = response.getErrorResponse<ErrorResponse>()
                     if (errorResponse != null) {
                         error = errorResponse.errors.toString()
+                    }else{
+                        error = ""
                     }
-                    saveUserPreferences(false, "", "", "", "", false)
-                    Api.setCookie("")
+
+                    if(user != null)
+                        saveUserPreferences(false, user!!.email, user!!.firstName, user!!.lastName, "", false)
+                    else
+                        saveUserPreferences(false, "", "", "", "", false)
+
+                    apiObject.setCookie("")
                 }
 
             } catch (ex: Exception) {
@@ -177,14 +182,16 @@ class UserViewModel(
         viewModelScope.launch {
             isBusy = true
             try {
-                //val response = Api.api.logout()
+                val response = api.logout()
 
-                isLoggedIn = false
-                user = null
-                saveUserPreferences(false, "", "", "", "", false)
-                Api.setCookie("")
-                loadUser()
-                onSuccess()
+                if (response.isSuccessful) {
+                    isLoggedIn = false
+                    user = null
+                    saveUserPreferences(false, "", "", "", "", false)
+                    apiObject.setCookie("")
+                    onSuccess()
+                }
+                
             } catch (ex: Exception) {
                 ex.printStackTrace()
             } finally {
@@ -214,7 +221,7 @@ class UserViewModel(
                     preferences.verified
                 )
                 isLoggedIn = preferences.isLoggedIn
-                Api.setCookie(preferences.cookie)
+                apiObject.setCookie(preferences.cookie)
             }
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -251,4 +258,4 @@ class UserViewModel(
 
 }
 
-val LocalUserState = compositionLocalOf<UserViewModel> { error("User State Context Not Found!") }
+//val LocalUserState = compositionLocalOf<UserViewModel> { error("User State Context Not Found!") }

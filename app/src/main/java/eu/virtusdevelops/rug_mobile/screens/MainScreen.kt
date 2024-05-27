@@ -5,34 +5,27 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -60,21 +53,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.PackageHolderStatus
 import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
-import eu.virtusdevelops.rug_mobile.viewModels.LocalPackageHolderListState
-import eu.virtusdevelops.rug_mobile.viewModels.LocalUserState
+import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderListViewModel
+import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.zip.ZipInputStream
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
@@ -84,7 +83,7 @@ import java.util.zip.ZipInputStream
 fun MainScreen(
     navController: NavController
 ) {
-    var viewModel = LocalUserState.current
+//    var viewModel = LocalUserState.current
     var presses by remember { mutableIntStateOf(0) }
     val scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
         result.let {
@@ -96,17 +95,19 @@ fun MainScreen(
         }
     }
 
-    val packageHolderViewModel = LocalPackageHolderListState.current
+    val viewModel = hiltViewModel<UserViewModel>()
+    val packageHolderViewModel = hiltViewModel<PackageHolderListViewModel>()
     val packageHolders by packageHolderViewModel.packageHolders.observeAsState(emptyList())
     val isBusy by remember { packageHolderViewModel::isBusy }
     val isError by remember { packageHolderViewModel::isError }
 
     // Load data when the composable is first composed
     LaunchedEffect(Unit) {
-        packageHolderViewModel.load()
+        if(!packageHolderViewModel.isLoaded)
+            packageHolderViewModel.load()
     }
 
-    if (!viewModel.isLoggedIn) {
+    if (!viewModel.isLoggedIn && !viewModel.isBusy) {
         navController.navigate(Screen.LoginScreen.route) {
             popUpTo(navController.graph.id)
         }
@@ -167,12 +168,12 @@ fun MainScreen(
                 } else if (isError) {
                     Text(text = "An error occurred. Please try again.")
                 } else {
-                    ListOfPackageHolders(packageHolders)
+                    ListOfPackageHolders(navController, packageHolders)
                 }
             }
         }
         Box(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().pullRefresh(refreshState),
             contentAlignment = Alignment.TopCenter){
 
             PullRefreshIndicator(
@@ -189,43 +190,77 @@ fun MainScreen(
 
 
 @Composable
-fun ListOfPackageHolders(packageHolders : List<PackageHolder>){
+fun ListOfPackageHolders(navController: NavController, packageHolders : List<PackageHolder>){
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         itemsIndexed(packageHolders) { _, packageHolder ->
-            PackageHolderBar(packageHolder)
+            PackageHolderBar(packageHolder) {
+                println("ID: " + packageHolder.id)
+                navController.navigate(Screen.PackageHolderScreen.createRoute(packageHolder.id))
+            }
         }
     }
 }
 
 @Composable
-fun PackageHolderBar(packageHolder: PackageHolder) {
+fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit) {
+    val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+    val lastModified = dateFormatter.format(packageHolder.lastModification)
+
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            // Content of the card
-            Column(
+        Box {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "ID: ${packageHolder.id}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = "ID: ${packageHolder.id}",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Last Modified: $lastModified",
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    StatusMessage(packageHolder.status)
+                }
 
-
-                StatusMessage(packageHolder.status)
+                // Open button
+                IconButton(
+                    onClick = onOpenClick,
+                    modifier = Modifier
+                        .size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Create,
+                        contentDescription = "Edit Package Holder",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
 
             // Status circle indicator
@@ -260,54 +295,22 @@ fun StatusMessage(status: PackageHolderStatus, modifier: Modifier = Modifier){
     )
 }
 
-@Composable
-fun StatusIndicator(status: PackageHolderStatus, modifier: Modifier = Modifier) {
-    val color = when (status) {
-        PackageHolderStatus.EMPTY, PackageHolderStatus.HOLDING_RECEIVED_PACKAGE -> Color.Green
-        PackageHolderStatus.WAITING_PACKAGE_DEPOSIT, PackageHolderStatus.WAITING_PACKAGE_INSERT -> Color.Yellow
-        else -> Color.Red
-    }
-
-    val animatedColor by animateColorAsState(targetValue = color, label = "")
-
-    Box(
-        modifier = modifier
-            .clip(CircleShape)
-            .background(animatedColor)
-    )
-}
 
 @Composable
 fun AnimatedStatusIndicator(status: PackageHolderStatus, modifier: Modifier = Modifier) {
     val targetColor = when (status) {
         PackageHolderStatus.EMPTY, PackageHolderStatus.HOLDING_RECEIVED_PACKAGE -> Color.Green
-        PackageHolderStatus.WAITING_PACKAGE_DEPOSIT, PackageHolderStatus.WAITING_PACKAGE_INSERT -> Color.Yellow
+        PackageHolderStatus.WAITING_PACKAGE_DEPOSIT, PackageHolderStatus.WAITING_PACKAGE_INSERT -> Color(252, 140, 3)
         else -> Color.Red
     }
-
-    val infiniteTransition = rememberInfiniteTransition(label = "")
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ), label = ""
-    )
-
-    val animatedColor by animateColorAsState(targetValue = targetColor, label = "")
-
     Box(
         modifier = modifier
+            .size(16.dp)
             .clip(CircleShape)
-            .background(animatedColor)
-            .then(
-                if (status == PackageHolderStatus.WAITING_PACKAGE_DEPOSIT || status == PackageHolderStatus.WAITING_PACKAGE_INSERT) {
-                    Modifier.alpha(alpha)
-                } else {
-                    Modifier
-                }
-            )
+            .background(targetColor)
+            .border(1.dp, targetColor.copy(alpha = 0.9f), CircleShape)
+            .shadow(9.dp, CircleShape)
+
     )
 }
 

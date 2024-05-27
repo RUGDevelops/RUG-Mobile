@@ -29,6 +29,10 @@ object Api {
         this.cookieValue = cookieValue
     }
 
+    fun getCookie(): String?{
+        return cookieValue
+    }
+
     private fun getOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(CookieInterceptor("auth_sid"))

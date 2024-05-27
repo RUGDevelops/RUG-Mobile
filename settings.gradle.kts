@@ -23,3 +23,14 @@ rootProject.name = "RUG-Mobile"
 include(":app")
 include(":app:datalib")
 include(":app:backendapi")
+
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.squareup:javapoet:1.13.0")
+    }
+}

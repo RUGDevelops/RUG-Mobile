@@ -9,24 +9,39 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.backendapi.Api
+import eu.virtusdevelops.backendapi.ApiRequest
 import eu.virtusdevelops.datalib.models.PackageHolder
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PackageHolderListViewModel(
-    private val application: Application
+
+@HiltViewModel
+class PackageHolderListViewModel @Inject constructor(
+    private val application: Application,
+    private val api: ApiRequest,
+    private val apiObject: Api
 )  : ViewModel()  {
     var isBusy by mutableStateOf(false)
     var isError by mutableStateOf(false)
+    var isLoaded by mutableStateOf(false)
     private val _packageHolders = MutableLiveData<List<PackageHolder>>()
     val packageHolders: LiveData<List<PackageHolder>> get() = _packageHolders
 
+    init {
+        println("Loading view model!!")
+    }
+
     fun load(){
         viewModelScope.launch {
+
+            println("New Cookie: ${apiObject.getCookie()}")
+
             isBusy = true
             isError = false
             try{
-                val response = Api.api.getPackageHolders()
+                val response = api.getPackageHolders()
 
                 println("Status: fetching")
 
@@ -49,10 +64,8 @@ class PackageHolderListViewModel(
                 ex.printStackTrace()
             }finally {
                 isBusy = false
+                isLoaded = true
             }
         }
     }
 }
-
-
-val LocalPackageHolderListState = compositionLocalOf<PackageHolderListViewModel> { error("PackageHolderList not found") }

@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android") version "2.51.1"
 }
 
 android {
@@ -30,17 +33,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
@@ -48,6 +48,7 @@ android {
         }
     }
 }
+
 
 dependencies {
 
@@ -74,10 +75,29 @@ dependencies {
 
 
 
+
     implementation(libs.quickie.bundled)
     implementation(project(":app:backendapi"))
     implementation(project(":app:datalib"))
-    implementation(libs.androidx.runtime.livedata) //qr code scanner
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.ui.text.google.fonts) //qr code scanner
+
+
+    // hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    kapt(libs.androidx.hilt.compiler)
+
+    // For instrumentation tests
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler)
+
+    // For local unit tests
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.compiler)
 
 
 

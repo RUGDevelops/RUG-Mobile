@@ -39,9 +39,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import eu.virtusdevelops.rug_mobile.viewModels.LocalUserState
+import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import androidx.compose.runtime.LaunchedEffect
 import eu.virtusdevelops.rug_mobile.passwordValidation.PasswordValidationState
 import eu.virtusdevelops.rug_mobile.passwordValidation.PasswordValidator
@@ -57,7 +60,7 @@ fun RegisterScreen(
     var repeatPassword by remember { mutableStateOf("") }
 
     var passwordVisibility by remember { mutableStateOf(false) }
-    val viewModel = LocalUserState.current
+    val viewModel = hiltViewModel<UserViewModel>()
     var passwordError by remember { mutableStateOf(PasswordValidationState()) }
     var fieldsError by remember { mutableStateOf(false) }
 

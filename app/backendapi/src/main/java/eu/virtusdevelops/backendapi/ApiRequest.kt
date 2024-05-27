@@ -1,4 +1,5 @@
 package eu.virtusdevelops.backendapi
+import eu.virtusdevelops.backendapi.requests.AddPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
 import eu.virtusdevelops.backendapi.responses.LoginResponse
@@ -11,7 +12,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
-
+import java.util.UUID
 
 
 interface ApiRequest {
@@ -34,5 +35,17 @@ interface ApiRequest {
     @Headers("Content-Type: application/json")
     @GET("package_holder")
     suspend fun getPackageHolders(): Response<List<PackageHolder>>
+
+
+    @Headers("Content-Type: application/json")
+    @GET("package_holder/{id}")
+    suspend fun getPackageHolderData(@Path("id") id: Int): Response<PackageHolder>
+
+    @Headers("Content-Type: application/json")
+    @POST("package_holder/add")
+    suspend fun addPackageHolder(@Body packageHolderData: AddPackageHolderRequest): Response<PackageHolder>
+
+
+
 
 }

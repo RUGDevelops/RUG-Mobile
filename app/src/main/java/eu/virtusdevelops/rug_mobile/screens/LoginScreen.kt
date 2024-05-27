@@ -35,24 +35,23 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import eu.virtusdevelops.rug_mobile.viewModels.LocalUserState
+import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 
 
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
 
     var passwordVisibility by remember { mutableStateOf(false) }
-    var fieldsError by remember { mutableStateOf(false) }
-
-    val viewModel = LocalUserState.current
+    val viewModel = hiltViewModel<UserViewModel>()
 
     val modifier = Modifier
         .padding(5.dp)
@@ -135,6 +134,7 @@ fun LoginScreen(
                 }else{
                     Text("Login")
                 }
+
 
             }
 
