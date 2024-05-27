@@ -61,7 +61,7 @@ class UserViewModel @Inject constructor(
                 if(response.code() == 401){
                     isLoggedIn = false
                     val tempUser = user ?: User("", "", "", false)
-                    saveUserPreferences(false, tempUser.email, tempUser.firstName, tempUser.lastName, "", false)
+                    saveUserPreferences(false, tempUser.email, tempUser.firstname, tempUser.lastname, "", false)
                 }
             }
             isBusy = false
@@ -171,7 +171,7 @@ class UserViewModel @Inject constructor(
                     }
 
                     if(user != null)
-                        saveUserPreferences(false, user!!.email, user!!.firstName, user!!.lastName, "", false)
+                        saveUserPreferences(false, user!!.email, user!!.firstname, user!!.lastname, "", false)
                     else
                         saveUserPreferences(false, "", "", "", "", false)
 

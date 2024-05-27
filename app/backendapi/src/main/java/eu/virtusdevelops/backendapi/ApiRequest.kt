@@ -1,8 +1,11 @@
 package eu.virtusdevelops.backendapi
 import eu.virtusdevelops.backendapi.requests.AddPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.LoginRequest
+import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
 import eu.virtusdevelops.backendapi.responses.LoginResponse
+import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
+import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
 import eu.virtusdevelops.backendapi.responses.RegisterResponse
 import eu.virtusdevelops.datalib.models.PackageHolder
 import retrofit2.Response
@@ -38,8 +41,18 @@ interface ApiRequest {
 
 
     @Headers("Content-Type: application/json")
+    @POST("package_holder/{id}/open")
+    suspend fun getPackageHolderOpenSound(@Path("id") id: Int, @Body openRequest: OpenPackageHolderRequest): Response<PackageHolderOpenResponse>
+
+
+    @Headers("Content-Type: application/json")
     @GET("package_holder/{id}")
     suspend fun getPackageHolderData(@Path("id") id: Int): Response<PackageHolder>
+
+    @Headers("Content-Type: application/json")
+    @GET("package_holder/{id}/history")
+    suspend fun getPackageHolderWithHistory(@Path("id") id: Int): Response<PackageHolderWithHistoryResponse>
+
 
     @Headers("Content-Type: application/json")
     @POST("package_holder/add")

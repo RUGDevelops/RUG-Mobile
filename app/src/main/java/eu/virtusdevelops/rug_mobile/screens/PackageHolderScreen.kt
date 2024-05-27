@@ -61,24 +61,31 @@ fun PackageHolderScreen(navController: NavController, packageHolderID: Int) {
     }
 
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        when {
-            isBusy -> {
+    when {
+        isBusy -> {
+            Box (
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ){
                 CircularProgressIndicator()
             }
-            else -> {
-                if(viewModel.packageHolder.value != null){
-                    // display packageholder
-                    Column {
-                        PackageHolderInfo(viewModel.packageHolder.value!!)
-                        PackageHolderHistory(viewModel.packageHolder.value!!)
-                    }
-                }else{
-                    Text(text = "Error occured, please try again")
+        }
+        else -> {
+            if(viewModel.packageHolder.value != null){
+                // display packageholder
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                        .padding(0.dp, 26.dp, 0.dp, 20.dp)
+
+                    ) {
+                    PackageHolderInfo(viewModel.packageHolder.value!!)
+                    PackageHolderHistory(viewModel.packageHolder.value!!)
                 }
+
+
+
+            }else{
+                Text(text = "Error occured, please try again")
             }
         }
     }
@@ -96,7 +103,7 @@ fun PackageHolderHistory(packageHolder: PackageHolder){
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
-    ){
+    ) {
         if(packageHolder.history != null){
             LazyColumn {
                 itemsIndexed(packageHolder.history) { _, item ->
@@ -114,9 +121,26 @@ fun PackageHolderHistory(packageHolder: PackageHolder){
 
 
 
+
 @Composable
 fun PackageHolderHistoryCard(action: PackageHolderAction){
-    Text(text = action.action)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text(
+            text = action.status,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = action.date.toString(), // Format this date as per your requirement
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 @Composable
@@ -128,7 +152,7 @@ fun PackageHolderInfo(packageHolder: PackageHolder) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant

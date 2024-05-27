@@ -41,7 +41,18 @@ class PackageHolderViewModel  @AssistedInject constructor(
             isLoaded = false
 
             try{
-                _packageHolder.value = repository.getPackageHolder(packageHolderID)
+
+                val data = repository.getPackageHolderWithHistory(packageHolderID)
+                println("Data: $data")
+                if(data == null){
+                    isError = true
+                }else{
+                    _packageHolder.value = data!!
+                }
+
+
+
+
 
             }catch (ex: Exception){
 

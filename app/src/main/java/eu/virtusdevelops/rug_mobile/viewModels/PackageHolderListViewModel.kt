@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.backendapi.Api
 import eu.virtusdevelops.backendapi.ApiRequest
 import eu.virtusdevelops.datalib.models.PackageHolder
+import eu.virtusdevelops.rug_mobile.repositories.PackageHolderRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,45 +21,30 @@ import javax.inject.Inject
 @HiltViewModel
 class PackageHolderListViewModel @Inject constructor(
     private val application: Application,
-    private val api: ApiRequest,
-    private val apiObject: Api
+//    private val api: ApiRequest,
+    private val repository: PackageHolderRepository,
 )  : ViewModel()  {
     var isBusy by mutableStateOf(false)
     var isError by mutableStateOf(false)
     var isLoaded by mutableStateOf(false)
+    var openSound by mutableStateOf("")
     private val _packageHolders = MutableLiveData<List<PackageHolder>>()
     val packageHolders: LiveData<List<PackageHolder>> get() = _packageHolders
 
-    init {
-        println("Loading view model!!")
-    }
 
     fun load(){
         viewModelScope.launch {
-
-            println("New Cookie: ${apiObject.getCookie()}")
-
             isBusy = true
             isError = false
             try{
-                val response = api.getPackageHolders()
+                val holders = repository.getPackageHolders()
 
-                println("Status: fetching")
-
-                if(response.isSuccessful){
-
-                    println("Status: ok")
-                    val responseBody = response.body()
-                    if(responseBody != null){
-                        _packageHolders.value = responseBody
-                    }
-                    println("Status: parsed")
-
-
+                if(holders != null){
+                    _packageHolders.value = holders
                 }else{
-                    println("Status: empty ${response.code()}")
                     isError = true
                 }
+
             }catch (ex :Exception){
                 isError = true
                 ex.printStackTrace()
@@ -68,4 +54,20 @@ class PackageHolderListViewModel @Inject constructor(
             }
         }
     }
+
+    fun getOpenSound(id: Int, onSuccess: () -> Unit){
+        openSound = ""
+//        isBusy = true
+        viewModelScope.launch {
+            try{
+
+                val sound = repository.getPackageHolderOpenSound(id)
+                openSound = sound
+                onSuccess()
+            }finally {
+//                isBusy = false
+            }
+        }
+    }
+
 }

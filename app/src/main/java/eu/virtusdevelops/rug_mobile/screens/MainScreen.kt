@@ -66,6 +66,7 @@ import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.PackageHolderStatus
 import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
 import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderListViewModel
+import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderViewModel
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
@@ -168,7 +169,7 @@ fun MainScreen(
                 } else if (isError) {
                     Text(text = "An error occurred. Please try again.")
                 } else {
-                    ListOfPackageHolders(navController, packageHolders)
+                    ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
                 }
             }
         }
@@ -190,22 +191,33 @@ fun MainScreen(
 
 
 @Composable
-fun ListOfPackageHolders(navController: NavController, packageHolders : List<PackageHolder>){
+fun ListOfPackageHolders(navController: NavController, packageHolderViewModel: PackageHolderListViewModel, packageHolders : List<PackageHolder>){
+
+    val openSound by remember { packageHolderViewModel::openSound }
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         itemsIndexed(packageHolders) { _, packageHolder ->
-            PackageHolderBar(packageHolder) {
-                println("ID: " + packageHolder.id)
+            PackageHolderBar(packageHolder, {
+                // make api request to get open soun
+                packageHolderViewModel.getOpenSound(packageHolder.id) {
+                    if (openSound.isNotEmpty())
+                        playBase64Wav(openSound)
+                }
+            },
+            {
                 navController.navigate(Screen.PackageHolderScreen.createRoute(packageHolder.id))
-            }
+            })
+
+
         }
     }
 }
 
 @Composable
-fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit) {
+fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit, onDetailsClick: () -> Unit) {
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     val lastModified = dateFormatter.format(packageHolder.lastModification)
 
@@ -217,7 +229,8 @@ fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit) {
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        ),
+        onClick = onDetailsClick
     ) {
         Box {
             Row(
