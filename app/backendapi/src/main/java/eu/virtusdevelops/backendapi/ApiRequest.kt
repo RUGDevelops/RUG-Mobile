@@ -30,7 +30,7 @@ interface ApiRequest {
 
     @Headers("Content-Type: application/json")
     @POST("auth/logout")
-    suspend fun logout(): Response<LoginResponse>
+    suspend fun logout(): Response<Void>
 
     @Headers("Content-Type: application/json")
     @GET("package_holder")
