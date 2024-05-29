@@ -8,6 +8,6 @@ data class PackageHolder(
     val internalID: UUID,
     val status: PackageHolderStatus,
     val owner: User,
-    var history: List<PackageHolderAction>,
+    var history: Map<String, List<PackageHolderAction>>,
     val lastModification: Date
 )

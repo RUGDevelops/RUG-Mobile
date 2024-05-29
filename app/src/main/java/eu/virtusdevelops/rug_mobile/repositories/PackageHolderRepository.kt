@@ -3,6 +3,9 @@ package eu.virtusdevelops.rug_mobile.repositories
 import eu.virtusdevelops.backendapi.ApiRequest
 import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
 import eu.virtusdevelops.datalib.models.PackageHolder
+import eu.virtusdevelops.datalib.models.PackageHolderAction
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
 
@@ -10,6 +13,7 @@ class  PackageHolderRepository @Inject constructor(
     private val api: ApiRequest
 ) {
 
+    private val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
 
 
@@ -22,10 +26,16 @@ class  PackageHolderRepository @Inject constructor(
             return response.body()
         }else{
             // throw errors?
-
-
             return null
         }
+    }
+
+
+
+    private fun splitHistoryByDays(history: List<PackageHolderAction>): Map<String, List<PackageHolderAction>>{
+        val sortedHistory = history.sortedByDescending { it.date }
+        return sortedHistory.groupBy { dateFormat.format(it.date) }
+
     }
 
 
@@ -33,11 +43,14 @@ class  PackageHolderRepository @Inject constructor(
         // call api
         val response = api.getPackageHolderWithHistory(packageHolderID)
 
+
         if(response.isSuccessful){
             val body = response.body()
             if(body != null){
+
+                // order and split history by days
                 val packageHolder = body.packageHolder
-                packageHolder.history = body.history
+                packageHolder.history = splitHistoryByDays(body.history)
                 return packageHolder
             }
         }else{

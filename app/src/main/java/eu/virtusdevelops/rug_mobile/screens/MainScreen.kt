@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -174,7 +176,9 @@ fun MainScreen(
             }
         }
         Box(
-            modifier = Modifier.fillMaxWidth().pullRefresh(refreshState),
+            modifier = Modifier
+                .fillMaxWidth()
+                .pullRefresh(refreshState),
             contentAlignment = Alignment.TopCenter){
 
             PullRefreshIndicator(
@@ -193,31 +197,32 @@ fun MainScreen(
 @Composable
 fun ListOfPackageHolders(navController: NavController, packageHolderViewModel: PackageHolderListViewModel, packageHolders : List<PackageHolder>){
 
-    val openSound by remember { packageHolderViewModel::openSound }
+    LazyColumn {
 
+        items(packageHolders) { packageHolder ->
+            val openSound by remember { packageHolderViewModel::openSound }
+            val isLoadingSound by packageHolderViewModel::isLoadingSound
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        itemsIndexed(packageHolders) { _, packageHolder ->
-            PackageHolderBar(packageHolder, {
-                // make api request to get open soun
-                packageHolderViewModel.getOpenSound(packageHolder.id) {
-                    if (openSound.isNotEmpty())
-                        playBase64Wav(openSound)
-                }
-            },
-            {
-                navController.navigate(Screen.PackageHolderScreen.createRoute(packageHolder.id))
-            })
-
-
+            PackageHolderBar(
+                packageHolder = packageHolder,
+                onOpenClick = {
+                    packageHolderViewModel.getOpenSound(packageHolder.id) {
+                        if (openSound.isNotEmpty())
+                            playBase64Wav(openSound)
+                    }
+                },
+                onDetailsClick = {
+                    if(!isLoadingSound)
+                        navController.navigate(Screen.PackageHolderScreen.createRoute(packageHolder.id))
+                },
+                isLoadingSound
+            )
         }
     }
 }
 
 @Composable
-fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit, onDetailsClick: () -> Unit) {
+fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit, onDetailsClick: () -> Unit, isLoading: Boolean) {
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     val lastModified = dateFormatter.format(packageHolder.lastModification)
 
@@ -228,7 +233,7 @@ fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit, onDe
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         onClick = onDetailsClick
     ) {
@@ -268,11 +273,23 @@ fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit, onDe
                     modifier = Modifier
                         .size(24.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Create,
-                        contentDescription = "Edit Package Holder",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    if(!isLoading){
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "Open package holder",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }else{
+
+                        CircularProgressIndicator()
+
+//                        Icon(
+//                            imageVector = Icons.Default.Lock,
+//                            contentDescription = "Open package holder",
+//                            tint = MaterialTheme.colorScheme.primary
+//                        )
+                    }
+
                 }
             }
 
