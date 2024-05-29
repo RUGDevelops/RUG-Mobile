@@ -1,4 +1,4 @@
-package eu.virtusdevelops.rug_mobile.screens
+package eu.virtusdevelops.rug_mobile.screens.auth
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
+import eu.virtusdevelops.rug_mobile.navigation.Graph
+import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 
 
@@ -29,7 +32,7 @@ fun SplashScreen(navController: NavController) {
             isLoggedIn -> {
                 // Ensure this only triggers navigation once
                 LaunchedEffect(Unit) {
-                    navController.navigate(Screen.MainScreen.route) {
+                    navController.navigate(Graph.HOME) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 }
@@ -37,7 +40,7 @@ fun SplashScreen(navController: NavController) {
             else -> {
                 // Ensure this only triggers navigation once
                 LaunchedEffect(Unit) {
-                    navController.navigate(Screen.LoginScreen.route) {
+                    navController.navigate(AuthGraph.LoginScreen.route) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 }

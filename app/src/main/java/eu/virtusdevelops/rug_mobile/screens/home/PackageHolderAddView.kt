@@ -1,4 +1,4 @@
-package eu.virtusdevelops.rug_mobile.screens
+package eu.virtusdevelops.rug_mobile.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 
 

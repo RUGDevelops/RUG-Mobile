@@ -1,4 +1,4 @@
-package eu.virtusdevelops.rug_mobile.screens
+package eu.virtusdevelops.rug_mobile.screens.auth
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -40,14 +40,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
 import androidx.compose.runtime.LaunchedEffect
+import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.passwordValidation.PasswordValidationState
 import eu.virtusdevelops.rug_mobile.passwordValidation.PasswordValidator
+import eu.virtusdevelops.rug_mobile.navigation.Screen
 
 @Composable
 fun RegisterScreen(
@@ -202,7 +202,7 @@ fun RegisterScreen(
                 onClick = {
                     viewModel.register(email, firstName, lastName, password, repeatPassword, onSuccess = {
                         Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screen.SplashScreen.route)
+                        navController.navigate(AuthGraph.LoginScreen.route)
                     })
                 },
                 enabled = passwordError.successful && fieldsError,
@@ -225,7 +225,7 @@ fun RegisterScreen(
                 modifier = Modifier.padding(5.dp),
                 style = TextStyle(fontWeight = FontWeight.Bold),
                 onClick = {
-                    navController.navigate(Screen.LoginScreen.route)
+                    navController.navigate(AuthGraph.LoginScreen.route)
                 })
         }
     }

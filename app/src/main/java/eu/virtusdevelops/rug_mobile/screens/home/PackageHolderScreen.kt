@@ -1,9 +1,9 @@
-package eu.virtusdevelops.rug_mobile.screens
+package eu.virtusdevelops.rug_mobile.screens.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,17 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -47,24 +43,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.PackageHolderAction
 import eu.virtusdevelops.datalib.models.PackageHolderActionStatus
 import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderViewModel
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
-import java.util.UUID
-
-
-
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun PackageHolderScreen(navController: NavController, packageHolderID: Int) {
+fun PackageHolderScreen(navController: NavController
+                        , packageHolderID: Int
+                        , innerPaddingValues: PaddingValues
+) {
     val viewModel =
         hiltViewModel<PackageHolderViewModel, PackageHolderViewModel.PackageHolderViewModelFactory>(
             creationCallback = { factory -> factory.create(packageHolderID = packageHolderID) }
@@ -87,6 +80,7 @@ fun PackageHolderScreen(navController: NavController, packageHolderID: Int) {
     )
 
     Scaffold(
+//        modifier = Modifier.padding(innerPaddingValues),
         topBar = {
             TopAppBar(
                 title = {

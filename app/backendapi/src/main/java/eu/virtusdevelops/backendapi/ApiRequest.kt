@@ -7,6 +7,7 @@ import eu.virtusdevelops.backendapi.responses.LoginResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
 import eu.virtusdevelops.backendapi.responses.RegisterResponse
+import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.PackageHolder
 import retrofit2.Response
 
@@ -59,6 +60,12 @@ interface ApiRequest {
     suspend fun addPackageHolder(@Body packageHolderData: AddPackageHolderRequest): Response<PackageHolder>
 
 
+    @Headers("Content-Type: application/json")
+    @GET("package/{id}")
+    suspend fun getPackageDetails(@Path("id") id: UUID): Response<DeliveryPackage>
 
 
+    @Headers("Content-Type: application/json")
+    @GET("package")
+    suspend fun getAllPackages(): Response<List<DeliveryPackage>>
 }

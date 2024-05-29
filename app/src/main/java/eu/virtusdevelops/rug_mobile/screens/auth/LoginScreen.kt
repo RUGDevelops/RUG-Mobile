@@ -1,4 +1,4 @@
-package eu.virtusdevelops.rug_mobile.screens
+package eu.virtusdevelops.rug_mobile.screens.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
+import eu.virtusdevelops.rug_mobile.navigation.Graph
+import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 
@@ -128,7 +130,7 @@ fun LoginScreen(
                 if(viewModel.isBusy){
                     CircularProgressIndicator()
                 }else if(viewModel.isLoggedIn){
-                    navController.navigate(Screen.MainScreen.route) {
+                    navController.navigate(Graph.HOME) {
                         popUpTo(navController.graph.id)
                     }
                 }else{
@@ -143,7 +145,7 @@ fun LoginScreen(
                 style = TextStyle(fontWeight = FontWeight.Bold),
                 text = AnnotatedString("Don't have an account? Register"),
             ) {
-                navController.navigate(Screen.RegisterScreen.route)
+                navController.navigate(AuthGraph.RegisterScreen.route)
             }
         }
     }
