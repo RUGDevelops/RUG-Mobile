@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
@@ -63,7 +64,8 @@ fun LoginScreen(
 
     Column(modifier = Modifier
         .fillMaxSize()
-        .padding(20.dp),
+        .padding(20.dp)
+        .systemBarsPadding(),
         verticalArrangement = Arrangement.SpaceBetween) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -77,7 +79,6 @@ fun LoginScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = (modifier.fillMaxSize(0.1f)))
             TextField(
                 value = username,
                 onValueChange = { username = it },
@@ -136,7 +137,6 @@ fun LoginScreen(
                 }else{
                     Text("Login")
                 }
-
 
             }
 
