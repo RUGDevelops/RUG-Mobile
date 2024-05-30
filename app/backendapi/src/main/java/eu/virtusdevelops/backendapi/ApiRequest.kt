@@ -67,5 +67,9 @@ interface ApiRequest {
 
     @Headers("Content-Type: application/json")
     @GET("package")
-    suspend fun getAllPackages(): Response<List<DeliveryPackage>>
+    suspend fun getAllIncomingPackages(): Response<List<DeliveryPackage>>
+
+    @Headers("Content-Type: application/json")
+    @GET("package/outgoing")
+    suspend fun getAllOutgoingPackages(): Response<List<DeliveryPackage>>
 }

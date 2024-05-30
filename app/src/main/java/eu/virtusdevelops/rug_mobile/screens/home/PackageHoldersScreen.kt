@@ -101,7 +101,11 @@ fun PackageHoldersScreen(
             } else if (isError) {
                 Text(text = "An error occurred. Please try again.")
             } else {
-                ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
+                if(packageHolders.isEmpty()){
+                    Text(text = "No package holders found.")
+                }else{
+                    ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
+                }
             }
         }
     }

@@ -141,11 +141,13 @@ fun LoginScreen(
             }
 
             ClickableText(
-                modifier = Modifier.padding(5.dp),
-                style = TextStyle(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(9.dp),
+                style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
                 text = AnnotatedString("Don't have an account? Register"),
             ) {
-                navController.navigate(AuthGraph.RegisterScreen.route)
+                navController.navigate(AuthGraph.RegisterScreen.route){
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
             }
         }
     }

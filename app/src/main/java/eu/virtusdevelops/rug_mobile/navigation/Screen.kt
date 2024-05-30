@@ -4,19 +4,28 @@ import android.graphics.drawable.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.ui.graphics.vector.ImageVector
+import eu.virtusdevelops.rug_mobile.R
+import java.util.UUID
 
-sealed class Screen(val route: String, val icon: ImageVector, val name: String) {
-//    data object LoginScreen : Screen("login_screen")
-    data object MainScreen : Screen("main_screen", Icons.Default.Lock, "Home")
-//    data object SplashScreen : Screen("splash_screen")
-//    data object RegisterScreen : Screen("register_screen")
-    data object PackageHoldersScreen : Screen("package_holders", Icons.Default.Lock, "Package Holders")
-//    data object PackageHolderScreen : Screen("package_holder_screen")
-
-    data object PackagesListScreen : Screen("packages", Icons.Default.Lock, "Packages")
-    data object PackageHolderScreen : Screen("package_holder_screen/{packageHolderID}", Icons.Default.Lock, "Package") {
+sealed class Screen(val route: String, val icon: Int, val name: String) {
+    data object MainScreen : Screen("main_screen", R.drawable.house_solid, "Home")
+    data object PackageHoldersScreen : Screen("package_holders", R.drawable.house_solid, "Package Holders")
+    data object SettingsScreen : Screen("settings", R.drawable.gear_solid, "Settings")
+    data object PackagesOutListScreen : Screen("packages_out", R.drawable.box_open_solid, "Outgoing packages")
+    data object PackagesInListScreen : Screen("packages_in", R.drawable.box_solid, "Incoming packages")
+    data object PackageHolderScreen : Screen("package_holder_screen/{packageHolderID}", R.drawable.box_solid, "Package Holder") {
         fun createRoute(packageHolderID: Int) = "package_holder_screen/$packageHolderID"
     }
+
+    data object IncomingPackageScreen : Screen("package_incoming/{packageID}", R.drawable.box_solid, "Package Details") {
+        fun createRoute(packageID: UUID) = "package_incoming/$packageID"
+    }
+
+
+    data object OutgoingPackageScreen : Screen("package_outgoing/{packageID}", R.drawable.box_open_solid, "Package Details") {
+        fun createRoute(packageID: UUID) = "package_outgoing/$packageID"
+    }
+
 }
 
 sealed class AuthGraph(val route:String){

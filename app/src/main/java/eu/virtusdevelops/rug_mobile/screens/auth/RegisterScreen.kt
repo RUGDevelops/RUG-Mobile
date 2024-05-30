@@ -206,7 +206,7 @@ fun RegisterScreen(
                         navController.navigate(AuthGraph.LoginScreen.route)
                     })
                 },
-                enabled = passwordError.successful && fieldsError,
+                enabled = passwordError.successful && !fieldsError,
                 modifier = modifier
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -223,10 +223,12 @@ fun RegisterScreen(
 
             ClickableText(
                 text = AnnotatedString("Already have an account? Login"),
-                modifier = Modifier.padding(5.dp),
-                style = TextStyle(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(9.dp),
+                style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
                 onClick = {
-                    navController.navigate(AuthGraph.LoginScreen.route)
+                    navController.navigate(AuthGraph.LoginScreen.route){
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
                 })
         }
     }

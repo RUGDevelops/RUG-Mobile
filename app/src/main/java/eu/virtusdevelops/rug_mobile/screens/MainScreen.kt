@@ -5,9 +5,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +26,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -34,7 +38,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.navigation.Screen
-import eu.virtusdevelops.rug_mobile.navigation.SetupHomeNavGraph
+import eu.virtusdevelops.rug_mobile.navigation.SetupNavGraph
 import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 import io.github.g00fy2.quickie.QRResult
@@ -65,41 +69,11 @@ fun MainScreen(
     val viewModel = hiltViewModel<UserViewModel>()
 
 
-//
-//
-//    if (!viewModel.isLoggedIn && !viewModel.isBusy) {
-//        navController.navigate(Screen.LoginScreen.route) {
-//            popUpTo(navController.graph.id)
-//        }
-//    }
+
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-//                    Text("Package holders")
-                },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.logout(onSuccess = {
-                            navController.navigate(Graph.AUTHENTICATION) {
-                                popUpTo(navController.graph.id)
-                            }
-                        })
-//                        if (!viewModel.isLoggedIn) {
-//                            navController.navigate(Screen.LoginScreen.route) {
-//                                popUpTo(navController.graph.id)
-//                            }
-//                        }
-                    }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Menu")
-                    }
-                }
-            )
+            TopNavBar(navController, viewModel)
         },
 //        floatingActionButton = {
 //            FloatingActionButton(onClick = { presses++ }) {
@@ -111,12 +85,7 @@ fun MainScreen(
         }
         // setup bottom bar here
     ) { innerPadding ->
-
-        SetupHomeNavGraph(navController = navController, innerPadding = innerPadding)
-
-//        Box(modifier = Modifier.padding(innerPadding)){
-//            PackageHoldersScreen(navController)
-//        }
+        SetupNavGraph(navController = navController, innerPadding = innerPadding)
     }
 }
 
@@ -127,8 +96,8 @@ fun MainScreen(
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         Screen.PackageHoldersScreen,
-        Screen.PackagesListScreen,
-//        Screen.MainScreen.route,
+        Screen.PackagesOutListScreen,
+        Screen.PackagesInListScreen
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -147,6 +116,56 @@ fun BottomBar(navController: NavHostController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopNavBar(navController: NavHostController, viewModel: UserViewModel){
+
+    val screens = listOf(
+        Screen.PackageHoldersScreen,
+        Screen.PackagesOutListScreen,
+        Screen.PackagesInListScreen,
+        Screen.SettingsScreen
+    )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val bottomBarDestination = screens.any { it.route == currentDestination?.route }
+
+
+    if (bottomBarDestination) {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+            ),
+            title = {
+                    Text(screens.find { it.route == currentDestination?.route }?.name ?: "Unknown")
+            },
+            actions = {
+                IconButton(onClick = {
+
+
+                    navController.navigate(Screen.SettingsScreen.route)
+
+//                    viewModel.logout(onSuccess = {
+//                        navController.navigate(Graph.AUTHENTICATION) {
+//                            popUpTo(navController.graph.id)
+//                        }
+//                    })
+//                        if (!viewModel.isLoggedIn) {
+//                            navController.navigate(Screen.LoginScreen.route) {
+//                                popUpTo(navController.graph.id)
+//                            }
+//                        }
+                }) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
+            }
+        )
+    }
+}
+
+
 @Composable
 fun RowScope.AddItem(
     screen: Screen,
@@ -157,13 +176,15 @@ fun RowScope.AddItem(
         Text(text = screen.name)
     }, icon = {
         Icon(
-            imageVector = screen.icon, contentDescription = "Navigation Icon"
+            painterResource(id = screen.icon),
+            modifier = Modifier.size(32.dp),
+            contentDescription = "Navigation Icon"
         )
     }, selected = currentDestination?.hierarchy?.any {
         it.route == screen.route
     } == true, onClick = {
         navController.navigate(screen.route) {
-            popUpTo(navController.graph.startDestinationId)
+            popUpTo(navController.graph.id)
             launchSingleTop = true
         }
     })

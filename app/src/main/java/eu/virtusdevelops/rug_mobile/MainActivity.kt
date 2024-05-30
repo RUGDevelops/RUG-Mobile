@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import eu.virtusdevelops.rug_mobile.navigation.SetupNavGraph
+import eu.virtusdevelops.rug_mobile.screens.MainScreen
 import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
 
 
@@ -35,7 +36,8 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         val navController = rememberNavController()
-                        SetupNavGraph(navController = navController)
+                        MainScreen(navController)
+//                        SetupNavGraph(navController = navController)
                     }
                 }
 //            }

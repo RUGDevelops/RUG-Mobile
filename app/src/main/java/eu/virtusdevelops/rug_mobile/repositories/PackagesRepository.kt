@@ -12,22 +12,32 @@ class PackagesRepository @Inject constructor(
 
 
     suspend fun getPackageDetails(packageID: UUID): DeliveryPackage?{
-
-
+        val response = api.getPackageDetails(packageID)
+        if(response.isSuccessful){
+            return response.body()
+        }
 
         return null
     }
 
-    suspend fun getPackages(): List<DeliveryPackage>{
-        val response = api.getAllPackages()
-
-
+    suspend fun getIncomingPackages(): List<DeliveryPackage>{
+        val response = api.getAllIncomingPackages()
         if(response.isSuccessful){
             return response.body()!!
         }else{
             // throw errors?
         }
+        return emptyList()
+    }
 
+
+    suspend fun getOutgoingPackages(): List<DeliveryPackage>{
+        val response = api.getAllOutgoingPackages()
+        if(response.isSuccessful){
+            return response.body()!!
+        }else{
+            // throw errors?
+        }
         return emptyList()
     }
 
