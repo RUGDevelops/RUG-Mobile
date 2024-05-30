@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,6 +16,7 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,18 +34,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
+import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackageStatus
+import eu.virtusdevelops.datalib.models.deliveryPackage.Recipient
 import eu.virtusdevelops.rug_mobile.screens.home.PackageHolderHistory
 import eu.virtusdevelops.rug_mobile.screens.home.PackageHolderInfo
+import eu.virtusdevelops.rug_mobile.screens.home.baseStatusList
 import eu.virtusdevelops.rug_mobile.viewModels.PackageViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun IncomingPackageView(navController: NavController,
                         innerPaddingValues: PaddingValues,
-                        deliveryPackageId: UUID){
+                        deliveryPackageId: UUID
+){
 
 
     val viewModel =
@@ -92,23 +103,19 @@ fun IncomingPackageView(navController: NavController,
         }
     ) {paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)){
-            if (isBusy) {
-                CircularProgressIndicator()
-            } else if (isError) {
+            if (isError) {
                 Text(text = "An error occurred. Please try again.")
-            } else {
-
-
             }
 
 
             Row(
-                modifier = Modifier.pullRefresh(refreshState)
+                modifier = Modifier
+                    .pullRefresh(refreshState)
+                    .fillMaxWidth()
             ){
                 if (deliveryPackage != null) {
 
-                    Text(text = deliveryPackage!!.id.toString())
-
+                    IncomingPackageCard(deliveryPackage!!, viewModel)
 
 
                 } else if(isError ){
@@ -131,13 +138,75 @@ fun IncomingPackageView(navController: NavController,
         }
     }
 
-
-    Box(
-        modifier = Modifier.padding(innerPaddingValues)
-    ) {
+}
 
 
 
+@Composable
+fun IncomingPackageCard(packageData: DeliveryPackage, viewModel: PackageViewModel) {
+
+    val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+    val dynamicStatusList = packageData.statusUpdateList.map { it.status }
+
+    val finalStatusList = baseStatusList.toMutableList().apply {
+        dynamicStatusList.filter { it == DeliveryPackageStatus.ON_ROUTE }.forEach { status ->
+            val index = indexOf(DeliveryPackageStatus.ON_ROUTE)
+            add(index + 1, status)
+        }
+        if (packageData.delivered && !contains(DeliveryPackageStatus.DELIVERED)) {
+            add(DeliveryPackageStatus.DELIVERED)
+        }
     }
 
+    val finalStatusUpdates = finalStatusList.map { status ->
+        DeliveryUpdate(
+            status = status,
+            date = packageData.statusUpdateList.find { it.status == status }?.date
+        )
+    }
+
+
+    Column (
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
+
+        DeliveryPackageDetailsCard(packageData)
+
+        PackageSenderInformation(packageData.sender)
+
+        PackageRecipientInformation(
+            Recipient(
+            packageData.recipientFirstName,
+            packageData.recipientLastName,
+            packageData.recipientEmail,
+            packageData.street,
+            packageData.houseNumber,
+            packageData.city,
+            packageData.postNumber,
+            packageData.country
+        )
+        )
+
+
+        Column (
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Updates",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            ElevatedCard{
+                VerticalProgressBar(
+                    statusUpdates = finalStatusUpdates,
+                    completedStatusList = dynamicStatusList
+                )
+            }
+        }
+    }
 }

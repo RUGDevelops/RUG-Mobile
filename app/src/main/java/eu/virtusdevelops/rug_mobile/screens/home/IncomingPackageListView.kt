@@ -87,11 +87,9 @@ fun IncomingPackageListView(navController: NavController, innerPaddingValues: Pa
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (isBusy) {
-                CircularProgressIndicator()
-            } else if (isError) {
+            if (isError) {
                 Text(text = "An error occurred. Please try again.")
-            } else {
+            } else if(!isBusy){
                 if(deliveryPackages.isEmpty()){
                     Text(text = "No packages found.")
                 }else{

@@ -129,13 +129,8 @@ fun OutgoingPackageView(navController: NavController,
         }
     ) {paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)){
-            if (isBusy) {
-                CircularProgressIndicator()
-            } else if (isError) {
+            if (isError) {
                 Text(text = "An error occurred. Please try again.")
-            } else {
-
-
             }
 
 
