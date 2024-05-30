@@ -39,6 +39,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,6 +48,7 @@ import androidx.navigation.NavController
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.PackageHolderAction
 import eu.virtusdevelops.datalib.models.PackageHolderActionStatus
+import eu.virtusdevelops.rug_mobile.R
 import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -242,7 +244,7 @@ fun PackageHolderActionItem(action: PackageHolderAction) {
     ) {
         // Add icon based on action status
         Icon(
-            imageVector = getActionIcon(action.status),
+            painterResource(getActionIcon(status = action.status)),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(46.dp)
@@ -261,13 +263,13 @@ fun PackageHolderActionItem(action: PackageHolderAction) {
 
 
 @Composable
-fun getActionIcon(status: PackageHolderActionStatus): ImageVector {
+fun getActionIcon(status: PackageHolderActionStatus): Int {
     return when (status) {
-        PackageHolderActionStatus.OPEN -> Icons.Default.Lock
-        PackageHolderActionStatus.PACKAGE_TAKEN -> Icons.Default.CheckCircle
-        PackageHolderActionStatus.DELIVER_PACKAGE -> Icons.Default.CheckCircle
-        PackageHolderActionStatus.DEPOSIT_PACKAGE -> Icons.Default.CheckCircle
-        PackageHolderActionStatus.PACKAGE_RECEIVED -> Icons.Default.CheckCircle
+        PackageHolderActionStatus.OPEN -> R.drawable.box_open_solid
+        PackageHolderActionStatus.PACKAGE_TAKEN -> R.drawable.box_open_solid
+        PackageHolderActionStatus.DELIVER_PACKAGE -> R.drawable.box_solid
+        PackageHolderActionStatus.DEPOSIT_PACKAGE -> R.drawable.box_solid
+        PackageHolderActionStatus.PACKAGE_RECEIVED -> R.drawable.box_solid
     }
 }
 

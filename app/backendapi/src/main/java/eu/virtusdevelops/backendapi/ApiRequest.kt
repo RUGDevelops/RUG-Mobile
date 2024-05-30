@@ -6,6 +6,7 @@ import eu.virtusdevelops.backendapi.requests.RegisterRequest
 import eu.virtusdevelops.backendapi.responses.LoginResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
+import eu.virtusdevelops.backendapi.responses.PackageVerifyResponse
 import eu.virtusdevelops.backendapi.responses.RegisterResponse
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.PackageHolder
@@ -72,4 +73,20 @@ interface ApiRequest {
     @Headers("Content-Type: application/json")
     @GET("package/outgoing")
     suspend fun getAllOutgoingPackages(): Response<List<DeliveryPackage>>
+
+
+    /**
+     * Call this to open package holder to deposit package
+     */
+    @Headers("Content-Type: application/json")
+    @POST("package/{id}/deposit")
+    suspend fun openPackageHolderToDeposit(@Path("id") id: UUID, @Body openRequest: OpenPackageHolderRequest): Response<PackageHolderOpenResponse>
+
+    /**
+     * Call this when u deposited package into package holder
+     */
+    @Headers("Content-Type: application/json")
+    @POST("package/{id}/verifySendPackage")
+    suspend fun verifyPackageSend(@Path("id") id: UUID): Response<PackageVerifyResponse>
+
 }

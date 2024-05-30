@@ -14,16 +14,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,43 +76,62 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
 
 
 
-    Box(
-        modifier = Modifier
-            .pullRefresh(refreshState)
-            .padding(innerPaddingValues)
-    ){
-        Column(
+
+
+    Scaffold(
+
+        floatingActionButton = {
+            androidx.compose.material3.FloatingActionButton(
+                onClick = {
+                  navController.navigate(Screen.SendPackage.route)
+                },
+                modifier = Modifier.padding(innerPaddingValues)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Send")
+            }
+        }
+    ) { _ ->
+        Box(
             modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (isBusy) {
-                CircularProgressIndicator()
-            } else if (isError) {
-                Text(text = "An error occurred. Please try again.")
-            } else {
-                if(deliveryPackages.isEmpty()){
-                    Text(text = "No packages found.")
-                }else{
-                    ListAllOutgoingPackages(packages = deliveryPackages, navController)
+                .pullRefresh(refreshState)
+                .padding(innerPaddingValues)
+        ){
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (isBusy) {
+                    CircularProgressIndicator()
+                } else if (isError) {
+                    Text(text = "An error occurred. Please try again.")
+                } else {
+                    if(deliveryPackages.isEmpty()){
+                        Text(text = "No packages found.")
+                    }else{
+                        ListAllOutgoingPackages(packages = deliveryPackages, navController)
+                    }
                 }
             }
         }
-    }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(innerPaddingValues)
-            .pullRefresh(refreshState),
-        contentAlignment = Alignment.TopCenter){
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPaddingValues)
+                .pullRefresh(refreshState),
+            contentAlignment = Alignment.TopCenter){
 
-        PullRefreshIndicator(
-            refreshing = isBusy,
-            state = refreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
+            PullRefreshIndicator(
+                refreshing = isBusy,
+                state = refreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
     }
+
+
+
 
 }
 
@@ -183,7 +205,7 @@ fun OutgoingDeliveryPackageCard(packageData: DeliveryPackage, onClick: () -> Uni
 
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Recipient: ${packageData.recipientFirstName} ${packageData.recipientLastName}",
@@ -222,7 +244,7 @@ fun OutgoingDeliveryPackageCard(packageData: DeliveryPackage, onClick: () -> Uni
 
 
             Spacer(modifier = Modifier.height(16.dp))
-            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
             Spacer(modifier = Modifier.height(16.dp))
             ProgressBar(
                 statusList = finalStatusList,

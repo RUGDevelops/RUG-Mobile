@@ -32,6 +32,13 @@ class PackageViewModel @AssistedInject constructor(
     var isError by mutableStateOf(false)
     var isLoaded by mutableStateOf(false)
 
+
+    var openSound by mutableStateOf("")
+    var isOpenError by mutableStateOf(false)
+
+    var isVerifyError by mutableStateOf(false)
+
+
     private val _deliveryPackage = MutableLiveData<DeliveryPackage?>()
     val deliveryPackage: LiveData<DeliveryPackage?> get() = _deliveryPackage
 
@@ -53,6 +60,54 @@ class PackageViewModel @AssistedInject constructor(
             }finally {
                 isBusy = false
                 isLoaded = true
+            }
+        }
+    }
+
+
+    fun openPackageHolder(onSuccess: () -> Unit){
+        viewModelScope.launch {
+            isBusy = true
+            isOpenError = false
+
+            try{
+                val openResponse = repository.getOpenSound(packageID)
+
+                if(openResponse != null){
+                    openSound = openResponse.data
+                    onSuccess()
+                }else{
+                    isOpenError = true
+                }
+
+            }catch (ex :Exception){
+                isOpenError = true
+            }finally {
+                isBusy = false
+            }
+        }
+    }
+
+
+    fun verifySendPackage(){
+        viewModelScope.launch {
+            isBusy = true
+            isVerifyError = false
+
+            try{
+                val openResponse = repository.verifyPackageSend(packageID)
+
+                if(openResponse != null){
+                    _deliveryPackage.value = openResponse
+
+                }else{
+                    isVerifyError = true
+                }
+
+            }catch (ex :Exception){
+                isVerifyError = true
+            }finally {
+                isBusy = false
             }
         }
     }

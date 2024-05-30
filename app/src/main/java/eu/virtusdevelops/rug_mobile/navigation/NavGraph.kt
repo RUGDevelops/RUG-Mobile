@@ -17,6 +17,7 @@ import eu.virtusdevelops.rug_mobile.screens.home.PackageHoldersScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.RegisterScreen
 import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.IncomingPackageView
 import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.OutgoingPackageView
+import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.SendPackageView
 import eu.virtusdevelops.rug_mobile.screens.home.OutgoingPackageListView
 import eu.virtusdevelops.rug_mobile.screens.home.IncomingPackageListView
 import java.util.UUID
@@ -72,6 +73,10 @@ fun NavGraphBuilder.packagesNavGraph(navController: NavHostController, innerPadd
         }
         composable(Screen.PackagesInListScreen.route){
             IncomingPackageListView(navController = navController, innerPaddingValues = innerPadding)
+        }
+
+        composable(Screen.SendPackage.route){
+            SendPackageView(navController = navController, paddingValues = innerPadding)
         }
 
 

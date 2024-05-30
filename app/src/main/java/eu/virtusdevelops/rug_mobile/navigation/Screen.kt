@@ -13,6 +13,8 @@ sealed class Screen(val route: String, val icon: Int, val name: String) {
     data object SettingsScreen : Screen("settings", R.drawable.gear_solid, "Settings")
     data object PackagesOutListScreen : Screen("packages_out", R.drawable.box_open_solid, "Outgoing packages")
     data object PackagesInListScreen : Screen("packages_in", R.drawable.box_solid, "Incoming packages")
+
+    data object SendPackage : Screen("package_send", R.drawable.box_open_solid, "Send Package")
     data object PackageHolderScreen : Screen("package_holder_screen/{packageHolderID}", R.drawable.box_solid, "Package Holder") {
         fun createRoute(packageHolderID: Int) = "package_holder_screen/$packageHolderID"
     }

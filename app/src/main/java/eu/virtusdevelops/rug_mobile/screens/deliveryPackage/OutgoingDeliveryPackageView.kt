@@ -1,5 +1,7 @@
 package eu.virtusdevelops.rug_mobile.screens.deliveryPackage
 
+import android.media.MediaPlayer
+import android.util.Base64
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +27,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -57,13 +61,18 @@ import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackageStatus
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackageStatusUpdate
 import eu.virtusdevelops.datalib.models.deliveryPackage.Recipient
 import eu.virtusdevelops.rug_mobile.R
+import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.screens.home.ProgressBar
 import eu.virtusdevelops.rug_mobile.screens.home.baseStatusList
+import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderViewModel
 import eu.virtusdevelops.rug_mobile.viewModels.PackageViewModel
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import java.util.zip.ZipInputStream
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -137,7 +146,7 @@ fun OutgoingPackageView(navController: NavController,
             ){
                 if (deliveryPackage != null) {
 
-                    OutgoingPackageCard(deliveryPackage!!)
+                    OutgoingPackageCard(deliveryPackage!!, viewModel)
 
 
                 } else if(isError ){
@@ -165,7 +174,7 @@ fun OutgoingPackageView(navController: NavController,
 data class DeliveryUpdate(val status: DeliveryPackageStatus, val date: Date?)
 
 @Composable
-fun OutgoingPackageCard(packageData: DeliveryPackage) {
+fun OutgoingPackageCard(packageData: DeliveryPackage, viewModel: PackageViewModel) {
 
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     val dynamicStatusList = packageData.statusUpdateList.map { it.status }
@@ -228,6 +237,9 @@ fun OutgoingPackageCard(packageData: DeliveryPackage) {
                 )
             }
         }
+
+
+        OutgoingPackageActions(packageData, viewModel)
     }
 }
 
@@ -240,10 +252,7 @@ fun DeliveryPackageDetailsCard(packageData: DeliveryPackage){
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
+        shape = RoundedCornerShape(16.dp)
     ){
         Column(
             modifier = Modifier
@@ -528,5 +537,125 @@ fun VerticalProgressBar(statusUpdates: List<DeliveryUpdate>, completedStatusList
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun OutgoingPackageActions(packageData: DeliveryPackage, viewModel: PackageViewModel) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+    ) {
+
+        Text(
+            text = "Actions",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+
+        val isDeposited =
+            packageData.statusUpdateList.any { it.status == DeliveryPackageStatus.WAITING_IN_PACKAGE_HOLDER }
+        val isPickedUp =
+            packageData.statusUpdateList.any { it.status == DeliveryPackageStatus.PICKED_UP_BY_DELIVERY }
+
+
+        val isBusy by viewModel::isBusy
+        val isSoundError by viewModel::isOpenError
+        val isVerifyError by viewModel::isVerifyError
+
+
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+        ){
+
+            if(!isDeposited){
+                // give open button that plays sound to open package holder
+                Button(
+                    onClick = {
+                        viewModel.openPackageHolder {
+                            playBase64Wav(viewModel.openSound)
+                        }
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+
+                    if(isBusy){
+                        CircularProgressIndicator()
+                    }else if (isSoundError){
+                        Text(text = "Try again", fontWeight = FontWeight.Bold)
+                    }else{
+                        Text(text = "Open holder", fontWeight = FontWeight.Bold)
+                    }
+
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // also give button to confirm deposit
+
+                Button(
+                    onClick = {
+                        viewModel.verifySendPackage()
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+
+                ) {
+
+                    if(isBusy){
+                        CircularProgressIndicator()
+                    }else if (isVerifyError){
+                        Text(text = "Failed", fontWeight = FontWeight.Bold)
+                    }else{
+                        Text(text = "Verify Package", fontWeight = FontWeight.Bold)
+                    }
+
+                }
+
+
+            }
+
+            if(!isPickedUp && isDeposited){
+                // display cancel delivery button
+            }
+
+        }
+
+    }
+}
+
+
+private fun playBase64Wav(base64Wav: String) {
+    // Decode the Base64 string to a byte array
+    val decodedWav = Base64.decode(base64Wav, Base64.DEFAULT)
+
+    // Write the byte array to a temporary .zip file
+    val tempZipFile = File.createTempFile("temp", ".zip")
+    val fos = FileOutputStream(tempZipFile)
+    fos.write(decodedWav)
+    fos.close()
+
+    // Unzip the .zip file to extract the .wav file
+    val zis = ZipInputStream(tempZipFile.inputStream())
+    val entry = zis.nextEntry
+    val tempWavFile = File.createTempFile("temp", ".wav")
+    tempWavFile.outputStream().use { it.write(zis.readBytes()) }
+
+    // Use a MediaPlayer to play the .wav file
+    val mediaPlayer = MediaPlayer()
+    mediaPlayer.setDataSource(tempWavFile.absolutePath)
+    mediaPlayer.prepareAsync()
+    mediaPlayer.setOnPreparedListener {
+        it.start()
     }
 }
