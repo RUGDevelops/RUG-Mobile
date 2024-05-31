@@ -99,7 +99,16 @@ dependencies {
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)
 
+    // Camerax implementation
+    val cameraxVersion = "1.3.3"
+    implementation ("androidx.camera:camera-core:${cameraxVersion}")
+    implementation ("androidx.camera:camera-camera2:${cameraxVersion}")
+    implementation ("androidx.camera:camera-view:${cameraxVersion}")
+    implementation ("androidx.camera:camera-lifecycle:$cameraxVersion")
+    // Camerax implementation
 
+    // Accompanist permissions
+    implementation ("com.google.accompanist:accompanist-permissions:0.20.0")
 
     testImplementation(libs.junit)
 

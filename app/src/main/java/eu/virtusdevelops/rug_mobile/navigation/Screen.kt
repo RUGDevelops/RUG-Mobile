@@ -34,4 +34,5 @@ sealed class AuthGraph(val route:String){
     data object LoginScreen : AuthGraph("login")
     data object RegisterScreen : AuthGraph("register")
     data object SplashScreen : AuthGraph("splash")
+    data object CameraPreviewScreen : AuthGraph("camera_preview")
 }

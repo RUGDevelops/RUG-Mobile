@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import eu.virtusdevelops.rug_mobile.screens.CameraPreviewScreen
 import eu.virtusdevelops.rug_mobile.screens.SettingsScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.SplashScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.LoginScreen
@@ -114,6 +115,9 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController){
         }
         composable(AuthGraph.SplashScreen.route){
             SplashScreen(navController)
+        }
+        composable(AuthGraph.CameraPreviewScreen.route) {
+            CameraPreviewScreen(navController)
         }
     }
 }

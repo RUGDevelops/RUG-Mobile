@@ -71,6 +71,7 @@ class UserViewModel @Inject constructor(
     fun register(email: String, password: String, firstName: String, lastName: String, repeatPassword: String, onSuccess: () -> Unit) {
         if (password.isEmpty() && repeatPassword.isEmpty()) {
             isLoggedIn = true
+            onSuccess()
             return
         }
 

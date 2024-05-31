@@ -162,25 +162,6 @@ fun RegisterScreen(
                     color = MaterialTheme.colorScheme.error
                 )
             }
-
-//            if (!passwordError.successful) {
-//                if (!passwordError.matching) {
-//                    Text("Passwords do not match",
-//                        color = if(!passwordError.matching) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
-//                }
-//                if (!passwordError.hasUpperCaseLetter) {
-//                    Text("Password must contain at least one uppercase letter", color = MaterialTheme.colorScheme.error)
-//                }
-//                if (!passwordError.hasLowerCaseLetter) {
-//                    Text("Password must contain at least one lowercase letter", color = MaterialTheme.colorScheme.error)
-//                }
-//                if (!passwordError.hasDigit) {
-//                    Text("Password must contain at least one digit", color = MaterialTheme.colorScheme.error)
-//                }
-//                if (!passwordError.hasSpecialCharacter) {
-//                    Text("Password must contain at least one special character", color = MaterialTheme.colorScheme.error)
-//                }
-//            }
         }
 
         Column(
@@ -202,11 +183,11 @@ fun RegisterScreen(
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
                     viewModel.register(email, firstName, lastName, password, repeatPassword, onSuccess = {
+                        navController.navigate(AuthGraph.CameraPreviewScreen.route)
                         Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
-                        navController.navigate(AuthGraph.LoginScreen.route)
                     })
                 },
-                enabled = passwordError.successful && !fieldsError,
+                //enabled = passwordError.successful && !fieldsError,
                 modifier = modifier
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
