@@ -1,5 +1,6 @@
 package eu.virtusdevelops.backendapi
 import eu.virtusdevelops.backendapi.requests.AddPackageHolderRequest
+import eu.virtusdevelops.backendapi.requests.ChangeDeviceTokenRequest
 import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
@@ -15,7 +16,9 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import java.util.UUID
 
@@ -88,5 +91,14 @@ interface ApiRequest {
     @Headers("Content-Type: application/json")
     @POST("package/{id}/verifySendPackage")
     suspend fun verifyPackageSend(@Path("id") id: UUID): Response<PackageVerifyResponse>
+
+
+    /**
+     * This is just for push notifications
+     * updating device token as that changes overtime
+     */
+    @Headers("Content-Type: application/json")
+    @PUT("device/{token}")
+    suspend fun updateDeviceToken(@Path("token") token: String, @Body newDeviceTokenRequest: ChangeDeviceTokenRequest): Response<String>
 
 }

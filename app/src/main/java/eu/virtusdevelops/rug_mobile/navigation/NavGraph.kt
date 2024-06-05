@@ -23,6 +23,7 @@ import eu.virtusdevelops.rug_mobile.screens.home.OutgoingPackageListView
 import eu.virtusdevelops.rug_mobile.screens.home.IncomingPackageListView
 import java.util.UUID
 
+
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
@@ -30,7 +31,7 @@ fun SetupNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Graph.AUTHENTICATION
+        startDestination = Graph.AUTHENTICATION,
     ) {
         authNavGraph(navController)
         mainNavGraph(navController, innerPadding)

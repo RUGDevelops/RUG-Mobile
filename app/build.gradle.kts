@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     kotlin("kapt")
     id("com.google.dagger.hilt.android") version "2.51.1"
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -82,6 +83,10 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.ui.text.google.fonts) //qr code scanner
 
+    // firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
 
     // hilt
     implementation(libs.hilt.android)
@@ -109,6 +114,7 @@ dependencies {
 
     // Accompanist permissions
     implementation ("com.google.accompanist:accompanist-permissions:0.20.0")
+
 
     testImplementation(libs.junit)
 

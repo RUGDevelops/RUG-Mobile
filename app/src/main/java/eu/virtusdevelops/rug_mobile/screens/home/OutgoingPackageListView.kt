@@ -1,5 +1,6 @@
 package eu.virtusdevelops.rug_mobile.screens.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,6 +50,7 @@ import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackageStatus
 import eu.virtusdevelops.rug_mobile.R
 import eu.virtusdevelops.rug_mobile.navigation.Screen
+import eu.virtusdevelops.rug_mobile.screens.GradientCard
 import eu.virtusdevelops.rug_mobile.viewModels.OutgoingPackageListViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -52,8 +58,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun OutgoingPackageListView(navController: NavController, innerPaddingValues: PaddingValues)
-{
+fun OutgoingPackageListView(navController: NavController, innerPaddingValues: PaddingValues) {
 
     val packagesListViewModel = hiltViewModel<OutgoingPackageListViewModel>()
     val deliveryPackages by packagesListViewModel.deliveryPackages.observeAsState(emptyList())
@@ -63,10 +68,9 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
 
     // Load data when the composable is first composed
     LaunchedEffect(Unit) {
-        if(!packagesListViewModel.isLoaded)
+        if (!packagesListViewModel.isLoaded)
             packagesListViewModel.load()
     }
-
 
 
     val refreshState = rememberPullRefreshState(
@@ -83,7 +87,7 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
         floatingActionButton = {
             androidx.compose.material3.FloatingActionButton(
                 onClick = {
-                  navController.navigate(Screen.SendPackage.route)
+                    navController.navigate(Screen.SendPackage.route)
                 },
                 modifier = Modifier.padding(innerPaddingValues)
             ) {
@@ -95,19 +99,26 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
             modifier = Modifier
                 .pullRefresh(refreshState)
                 .padding(innerPaddingValues)
-        ){
+        ) {
+
+
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (isError) {
                     Text(text = "An error occurred. Please try again.")
-                } else if(!isBusy){
-                    if(deliveryPackages.isEmpty()){
-                        Text(text = "No packages found.")
-                    }else{
+                } else if (!isBusy) {
+                    if (deliveryPackages.isEmpty()) {
+
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Text(text = "No packages found.")
+                        }
+
+                    } else {
                         ListAllOutgoingPackages(packages = deliveryPackages, navController)
                     }
                 }
@@ -118,7 +129,8 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
                 .fillMaxWidth()
                 .padding(innerPaddingValues)
                 .pullRefresh(refreshState),
-            contentAlignment = Alignment.TopCenter){
+            contentAlignment = Alignment.TopCenter
+        ) {
 
             PullRefreshIndicator(
                 refreshing = isBusy,
@@ -129,16 +141,14 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
     }
 
 
-
-
 }
 
 
 @Composable
-fun ListAllOutgoingPackages(packages: List<DeliveryPackage>, navController: NavController){
+fun ListAllOutgoingPackages(packages: List<DeliveryPackage>, navController: NavController) {
     LazyColumn {
         packages.forEach {
-            item{
+            item {
                 OutgoingDeliveryPackageCard(it) {
                     navController.navigate(Screen.OutgoingPackageScreen.createRoute(it.id))
                 }
@@ -148,13 +158,13 @@ fun ListAllOutgoingPackages(packages: List<DeliveryPackage>, navController: NavC
 }
 
 
-
 @Composable
 fun OutgoingDeliveryPackageCard(packageData: DeliveryPackage, onClick: () -> Unit) {
 
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     val sentDate = dateFormatter.format(packageData.sentDate)
-    val deliveryDate = packageData.estimatedDeliveryDate?.let { dateFormatter.format(it) } ?: "Not Available"
+    val deliveryDate =
+        packageData.estimatedDeliveryDate?.let { dateFormatter.format(it) } ?: "Not Available"
 
 
     val dynamicStatusList = packageData.statusUpdateList.map { it.status }
@@ -168,19 +178,25 @@ fun OutgoingDeliveryPackageCard(packageData: DeliveryPackage, onClick: () -> Uni
         }
     }
 
-    ElevatedCard(
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+    val screenWidthPx = with(density) {
+        configuration.screenWidthDp.dp.toPx()
+    }
+
+    GradientCard(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
         onClick = onClick,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
+
+
     ) {
+
         Column(
             modifier = Modifier
                 .padding(16.dp)
+
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -231,7 +247,7 @@ fun OutgoingDeliveryPackageCard(packageData: DeliveryPackage, onClick: () -> Uni
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if(packageData.deliveryPackageHolder != null){
+            if (packageData.deliveryPackageHolder != null) {
                 Text(
                     text = "Packageholder: ${packageData.deliveryPackageHolder!!.id}",
                     fontSize = 16.sp,
@@ -250,7 +266,9 @@ fun OutgoingDeliveryPackageCard(packageData: DeliveryPackage, onClick: () -> Uni
             )
         }
     }
+
 }
+
 
 
 

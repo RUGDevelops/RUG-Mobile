@@ -7,6 +7,7 @@ constraintlayout = "2.1.4"
 converterGson = "2.11.0"
 converterGsonVersion = "latest.version"
 datastorePreferences = "1.1.1"
+firebaseBom = "33.1.0"
 foundation = "1.6.7"
 gson = "2.11.0"
 hiltAndroid = "2.51.1"
@@ -41,6 +42,8 @@ androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref =
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCompiler" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }

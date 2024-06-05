@@ -123,8 +123,7 @@ fun TopNavBar(navController: NavHostController, viewModel: UserViewModel){
     val screens = listOf(
         Screen.PackageHoldersScreen,
         Screen.PackagesOutListScreen,
-        Screen.PackagesInListScreen,
-        Screen.SettingsScreen
+        Screen.PackagesInListScreen
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination

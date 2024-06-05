@@ -42,7 +42,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,6 +54,7 @@ import androidx.navigation.NavController
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.PackageHolderStatus
 import eu.virtusdevelops.rug_mobile.navigation.Screen
+import eu.virtusdevelops.rug_mobile.screens.GradientCard
 import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderListViewModel
 import java.io.File
 import java.io.FileOutputStream
@@ -159,18 +164,35 @@ fun PackageHolderBar(packageHolder: PackageHolder, onOpenClick: () -> Unit, onDe
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     val lastModified = dateFormatter.format(packageHolder.lastModification)
 
-    ElevatedCard(
+
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+    val screenWidthPx = with(density) {
+        configuration.screenWidthDp.dp.toPx()
+    }
+
+    GradientCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        ),
         onClick = onDetailsClick
     ) {
-        Box {
+        Box (
+            modifier = Modifier
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                            MaterialTheme.colorScheme.surfaceContainer
+                        ),
+                        center = Offset(
+                            x = screenWidthPx / 1.1f,
+                            y = -100f
+                        ),
+                        radius = screenWidthPx
+                    )
+                )
+        ){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

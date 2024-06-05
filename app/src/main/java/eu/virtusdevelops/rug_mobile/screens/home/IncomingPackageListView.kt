@@ -84,7 +84,6 @@ fun IncomingPackageListView(navController: NavController, innerPaddingValues: Pa
         Column(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (isError) {

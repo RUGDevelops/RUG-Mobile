@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,11 +27,9 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,6 +59,7 @@ import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackageStatusUpd
 import eu.virtusdevelops.datalib.models.deliveryPackage.Recipient
 import eu.virtusdevelops.rug_mobile.R
 import eu.virtusdevelops.rug_mobile.navigation.Graph
+import eu.virtusdevelops.rug_mobile.screens.GradientCard
 import eu.virtusdevelops.rug_mobile.screens.home.ProgressBar
 import eu.virtusdevelops.rug_mobile.screens.home.baseStatusList
 import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderViewModel
@@ -225,7 +223,9 @@ fun OutgoingPackageCard(packageData: DeliveryPackage, viewModel: PackageViewMode
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            ElevatedCard{
+            GradientCard(
+                onClick = { }
+            ){
                 VerticalProgressBar(
                     statusUpdates = finalStatusUpdates,
                     completedStatusList = dynamicStatusList
@@ -243,11 +243,11 @@ fun DeliveryPackageDetailsCard(packageData: DeliveryPackage){
     val dateFormatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     val sentDate = dateFormatter.format(packageData.sentDate)
     val deliveryDate = packageData.estimatedDeliveryDate?.let { dateFormatter.format(it) } ?: "Not Available"
-    ElevatedCard (
+    GradientCard (
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp)
+        onClick = {}
     ){
         Column(
             modifier = Modifier
@@ -274,7 +274,7 @@ fun DeliveryPackageDetailsCard(packageData: DeliveryPackage){
 
             }
             Spacer(modifier = Modifier.height(2.dp))
-            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Sent Date: $sentDate",
@@ -326,7 +326,7 @@ fun PackageSenderInformation(user: User){
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        ElevatedCard{
+        GradientCard(onClick = {}){
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -352,7 +352,7 @@ fun PackageSenderInformation(user: User){
 
                 }
                 Spacer(modifier = Modifier.height(2.dp))
-                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Firstname: ${user.firstname}",
@@ -390,7 +390,7 @@ fun PackageRecipientInformation(recipient: Recipient){
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        ElevatedCard{
+        GradientCard(onClick = {}){
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -416,7 +416,7 @@ fun PackageRecipientInformation(recipient: Recipient){
 
                 }
                 Spacer(modifier = Modifier.height(2.dp))
-                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Firstname: ${recipient.firstname}",
@@ -564,9 +564,10 @@ fun OutgoingPackageActions(packageData: DeliveryPackage, viewModel: PackageViewM
         val isVerifyError by viewModel::isVerifyError
 
 
-        ElevatedCard(
+        GradientCard(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            onClick = {}
         ){
 
             if(!isDeposited){
@@ -578,7 +579,8 @@ fun OutgoingPackageActions(packageData: DeliveryPackage, viewModel: PackageViewM
                         }
                     },
                     shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 8.dp)
                 ) {
 

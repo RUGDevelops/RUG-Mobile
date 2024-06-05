@@ -41,6 +41,7 @@ import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.navigation.Screen
+import eu.virtusdevelops.rug_mobile.screens.GradientBackground
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 
@@ -62,95 +63,102 @@ fun LoginScreen(
 
     isError = username.isEmpty() && password.isEmpty()
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(20.dp)
-        .systemBarsPadding(),
-        verticalArrangement = Arrangement.SpaceBetween) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
 
-            //make bold text with different font
-            Text(
-                text = "LOGIN", modifier = Modifier.padding(5.dp),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-            TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Email") },
-                placeholder = { Text("Your email here") },
-                singleLine = true,
-                modifier = modifier,
-                isError = isError,
-                leadingIcon = {
-                    Icon(Icons.Filled.Person, contentDescription = "Username")
-                })
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                placeholder = { Text("Your password here") },
-                singleLine = true,
-                visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                modifier = modifier,
-                isError = isError,
-                leadingIcon = {
-                    IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                        Icon(Icons.Filled.Lock, contentDescription = "Toggle password visibility")
-                    }
-                }
-            )
-            if (isError) {
-                Text(
-                    "Fields must not be empty",
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        }
+    GradientBackground (
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(
-                shape = RoundedCornerShape(10.dp),
-                onClick = {
-                    viewModel.login(username, password)
-                },
-                modifier = modifier
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.primary)) {
-
-                if(viewModel.isBusy){
-                    CircularProgressIndicator()
-                }else if(viewModel.isLoggedIn){
-                    navController.navigate(Graph.HOME) {
-                        popUpTo(navController.graph.id)
-                    }
-                }else{
-                    Text("Login")
-                }
-
-            }
-
-            ClickableText(
-                modifier = Modifier.padding(9.dp),
-                style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
-                text = AnnotatedString("Don't have an account? Register"),
+    ) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+            .systemBarsPadding(),
+            verticalArrangement = Arrangement.SpaceBetween) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                navController.navigate(AuthGraph.RegisterScreen.route){
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+
+                //make bold text with different font
+                Text(
+                    text = "LOGIN", modifier = Modifier.padding(5.dp),
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                TextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Email") },
+                    placeholder = { Text("Your email here") },
+                    singleLine = true,
+                    modifier = modifier,
+                    isError = isError,
+                    leadingIcon = {
+                        Icon(Icons.Filled.Person, contentDescription = "Username")
+                    })
+                TextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    placeholder = { Text("Your password here") },
+                    singleLine = true,
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
+                    modifier = modifier,
+                    isError = isError,
+                    leadingIcon = {
+                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                            Icon(Icons.Filled.Lock, contentDescription = "Toggle password visibility")
+                        }
+                    }
+                )
+                if (isError) {
+                    Text(
+                        "Fields must not be empty",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Button(
+                    shape = RoundedCornerShape(10.dp),
+                    onClick = {
+                        viewModel.login(username, password)
+                    },
+                    modifier = modifier
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primary)) {
+
+                    if(viewModel.isBusy){
+                        CircularProgressIndicator()
+                    }else if(viewModel.isLoggedIn){
+                        navController.navigate(Graph.HOME) {
+                            popUpTo(navController.graph.id)
+                        }
+                    }else{
+                        Text("Login")
+                    }
+
+                }
+
+                ClickableText(
+                    modifier = Modifier.padding(9.dp),
+                    style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
+                    text = AnnotatedString("Don't have an account? Register"),
+                ) {
+                    navController.navigate(AuthGraph.RegisterScreen.route){
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
                 }
             }
         }
     }
+
+
 }
 
 
