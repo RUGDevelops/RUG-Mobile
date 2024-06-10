@@ -15,7 +15,10 @@ env:
   ks_alias_pass: ${{ secrets.KEY_ALIAS_PASS }}
 
 
-on: ['push', 'workflow_dispatch']
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
