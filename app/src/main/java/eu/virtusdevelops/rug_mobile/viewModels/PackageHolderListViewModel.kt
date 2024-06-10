@@ -41,7 +41,7 @@ class PackageHolderListViewModel @Inject constructor(
                 val holders = repository.getPackageHolders()
 
                 if(holders != null){
-                    _packageHolders.value = holders
+                    _packageHolders.value = holders!!
                 }else{
                     isError = true
                 }
