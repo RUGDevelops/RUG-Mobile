@@ -10,6 +10,7 @@ datastorePreferences = "1.1.1"
 firebaseBom = "33.1.0"
 foundation = "1.6.7"
 gson = "2.11.0"
+hazeJetpackCompose = "0.7.1"
 hiltAndroid = "2.51.1"
 hiltCompiler = "1.2.0"
 kotlin = "2.0.0"
@@ -45,6 +46,7 @@ converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+haze-jetpack-compose = { module = "dev.chrisbanes.haze:haze", version.ref = "hazeJetpackCompose" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }

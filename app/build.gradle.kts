@@ -87,6 +87,9 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
 
+    // haze
+    implementation(libs.haze.jetpack.compose)
+
 
     // hilt
     implementation(libs.hilt.android)
