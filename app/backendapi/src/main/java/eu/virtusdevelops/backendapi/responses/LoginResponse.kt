@@ -1,8 +1,7 @@
 package eu.virtusdevelops.backendapi.responses
 
+import eu.virtusdevelops.datalib.models.User
+
 data class LoginResponse(
-    val email: String,
-    val firstname: String,
-    val lastname: String,
-    val verified: Boolean
+    val user: User
 )

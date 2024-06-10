@@ -1,8 +1,19 @@
 package eu.virtusdevelops.rug_mobile.screens.auth
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.util.Log
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
+import androidx.camera.view.CameraController
+import androidx.camera.view.LifecycleCameraController
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,13 +22,11 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -28,33 +37,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Graph
-import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.screens.GradientBackground
+import eu.virtusdevelops.rug_mobile.screens.GradientCard
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 
 
 @Composable
-fun LoginScreen(
+fun FaceLoginScreen(
     navController: NavController,
+    innerPaddingValues: PaddingValues
 ) {
+
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
 
-    var passwordVisibility by remember { mutableStateOf(false) }
     val viewModel = hiltViewModel<UserViewModel>()
 
     val modifier = Modifier
@@ -64,26 +73,51 @@ fun LoginScreen(
     isError = username.isEmpty() && password.isEmpty()
 
 
+    val context = LocalContext.current
+
+    var controller = remember {
+        LifecycleCameraController(context).apply {
+            setEnabledUseCases(
+                CameraController.IMAGE_CAPTURE
+            )
+            cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+        }
+    }
+
+
+
     GradientBackground (
 
     ) {
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
-            .systemBarsPadding(),
-            verticalArrangement = Arrangement.SpaceBetween) {
+            .padding(innerPaddingValues)
+            .systemBarsPadding()) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 //make bold text with different font
-                Text(
-                    text = "LOGIN", modifier = Modifier.padding(5.dp),
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
+
+
+                GradientCard(
+                    onClick =  {},
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .height(450.dp)
+                        .fillMaxWidth()
+                ){
+                    CameraPreview(
+                        controller = controller,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxSize()
+                    )
+                }
+                
+
+
                 TextField(
                     value = username,
                     onValueChange = { username = it },
@@ -95,21 +129,7 @@ fun LoginScreen(
                     leadingIcon = {
                         Icon(Icons.Filled.Person, contentDescription = "Username")
                     })
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    placeholder = { Text("Your password here") },
-                    singleLine = true,
-                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    modifier = modifier,
-                    isError = isError,
-                    leadingIcon = {
-                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                            Icon(Icons.Filled.Lock, contentDescription = "Toggle password visibility")
-                        }
-                    }
-                )
+
                 if (isError) {
                     Text(
                         "Fields must not be empty",
@@ -118,6 +138,8 @@ fun LoginScreen(
                 }
             }
 
+//            TODO: add camera open shit and save image watever kura
+
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -125,7 +147,18 @@ fun LoginScreen(
                 Button(
                     shape = RoundedCornerShape(10.dp),
                     onClick = {
-                        viewModel.login(username, password)
+
+                        takePhoto(
+                            context,
+                            controller = controller,
+                            onPhotoTaken = {
+                                viewModel.loginWithImage(
+                                    username,
+                                    it
+                                )
+                            }
+                        )
+
                     },
                     modifier = modifier
                         .height(50.dp),
@@ -148,9 +181,9 @@ fun LoginScreen(
                 ClickableText(
                     modifier = Modifier.padding(9.dp),
                     style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface),
-                    text = AnnotatedString("Face login"),
+                    text = AnnotatedString("No face login? Click here"),
                 ) {
-                    navController.navigate(AuthGraph.FaceLoginScreen.route){
+                    navController.navigate(AuthGraph.LoginScreen.route){
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 }
@@ -168,16 +201,61 @@ fun LoginScreen(
     }
 
 
+
+}
+
+private fun takePhoto(
+    applicationContext: Context,
+    controller: LifecycleCameraController,
+    onPhotoTaken: (Bitmap) -> Unit
+) {
+    controller.takePicture(
+        ContextCompat.getMainExecutor(applicationContext),
+        object : ImageCapture.OnImageCapturedCallback() {
+            override fun onCaptureSuccess(image: ImageProxy) {
+                super.onCaptureSuccess(image)
+
+                val matrix = Matrix().apply {
+                    postRotate(image.imageInfo.rotationDegrees.toFloat())
+                }
+                val rotatedBitmap = Bitmap.createBitmap(
+                    image.toBitmap(),
+                    0,
+                    0,
+                    image.width,
+                    image.height,
+                    matrix,
+                    true
+                )
+
+                Log.i("Camera", "Took new photo!")
+
+                onPhotoTaken(rotatedBitmap)
+            }
+
+            override fun onError(exception: ImageCaptureException) {
+                super.onError(exception)
+                Log.e("Camera", "Couldn't take photo: ", exception)
+            }
+        }
+    )
 }
 
 
-val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-    throwable.printStackTrace()
-}
-
-
-@Preview
 @Composable
-fun PreviewLoginScreen() {
-    LoginScreen(navController = rememberNavController())
+fun CameraPreview(
+    controller: LifecycleCameraController,
+    modifier: Modifier = Modifier
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    AndroidView(
+        factory = {
+            PreviewView(it).apply {
+                this.controller = controller
+                controller.bindToLifecycle(lifecycleOwner)
+            }
+        },
+        modifier = modifier
+    )
 }
+

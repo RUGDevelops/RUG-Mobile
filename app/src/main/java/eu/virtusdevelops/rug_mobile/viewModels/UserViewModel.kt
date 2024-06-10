@@ -1,9 +1,8 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
 import android.app.Application
-import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,12 +19,14 @@ import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
 import eu.virtusdevelops.backendapi.responses.ErrorResponse
 import eu.virtusdevelops.datalib.models.User
-import eu.virtusdevelops.rug_mobile.RUGApplication
 import eu.virtusdevelops.rug_mobile.dataStore
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 
@@ -115,6 +116,105 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    fun loginWithImage(email: String, image: Bitmap){
+        isBusy = true
+        viewModelScope.launch {
+            isLoggedIn = false
+
+
+            try{
+                Log.i("LOGIN", "Okay parsing image")
+                val imagePart = MultipartBody.Part.createFormData(
+                    "faceImage",
+                    "faceImage.jpg",
+                    RequestBody.create(
+                        MediaType.parse("image/*"),
+                        imageToBitmap(image)
+                    )
+                )
+
+                Log.i("LOGIN", "Okay parsing email")
+//                val emailPart = MultipartBody.Part.createFormData(
+//                    "email",
+//                    email
+//                )
+                val emailPart = RequestBody.create(MediaType.parse("multipart/form-data"), email)
+
+
+                Log.i("LOGIN", "Okay parsing device token")
+                val deviceTokenPart = RequestBody.create(MediaType.parse("multipart/form-data"), "RANDOM")
+
+                Log.i("LOGIN", "Okay sending request")
+                val response = api.faceLogin(imagePart, emailPart, deviceTokenPart)
+
+                println(response)
+
+                if (response.isSuccessful) {
+                    println("Is successful?")
+                    //2FA face recognition
+
+
+                    isLoggedIn = true
+                    val data = response.body()
+
+                    val cookies = response.headers().get("Set-Cookie")
+                    var cookie = ""
+                    if (cookies?.contains("auth_sid") == true) {
+                        cookie = cookies.split("=")[1].split(";")[0]
+                    }
+
+
+
+                    if (data != null) {
+
+                        saveUserPreferences(
+                            true,
+                            data.user.email,
+                            data.user.firstname,
+                            data.user.lastname,
+                            cookie,
+                            data.user.verified
+                        )
+                        user = data.user
+                        apiObject.setCookie(cookie)
+                    }
+
+                } else {
+                    Log.e("LOGIN", "Failed")
+                    isLoggedIn = false
+
+                    val errorResponse = response.getErrorResponse<ErrorResponse>()
+                    if (errorResponse != null) {
+                        error = errorResponse.errors.toString()
+                    }else{
+                        error = ""
+                    }
+
+                    if(user != null)
+                        saveUserPreferences(false, user!!.email, user!!.firstname, user!!.lastname, "", false)
+                    else
+                        saveUserPreferences(false, "", "", "", "", false)
+
+                    apiObject.setCookie("")
+                }
+            } catch (ex: Exception) {
+                Log.e("LOGIN", "Failed with exception", ex)
+                error = ""
+            } finally {
+                isBusy = false
+            }
+
+        }
+
+
+    }
+
+    private fun imageToBitmap(image: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
+    }
+
     fun login(email: String, password: String) {
 
         if (password.isEmpty()) {
@@ -131,7 +231,8 @@ class UserViewModel @Inject constructor(
                 val response = api.login(
                     LoginRequest(
                         email,
-                        password
+                        password,
+                        "TODO"
                     )
                 )
 
@@ -148,16 +249,19 @@ class UserViewModel @Inject constructor(
                         cookie = cookies.split("=")[1].split(";")[0]
                     }
 
+
+
                     if (data != null) {
+
                         saveUserPreferences(
                             true,
                             email,
-                            data.firstname,
-                            data.lastname,
+                            data.user.firstname,
+                            data.user.lastname,
                             cookie,
-                            data.verified
+                            data.user.verified
                         )
-                        user = User(data.email, data.firstname, data.lastname, data.verified)
+                        user = data.user
                         apiObject.setCookie(cookie)
                     }
 
@@ -178,11 +282,9 @@ class UserViewModel @Inject constructor(
 
                     apiObject.setCookie("")
                 }
-
             } catch (ex: Exception) {
                 error = ""
                 ex.printStackTrace()
-
             } finally {
                 isBusy = false
             }
