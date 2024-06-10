@@ -94,7 +94,7 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
                 Icon(Icons.Default.Add, contentDescription = "Send")
             }
         }
-    ) { _ ->
+    ) { padding ->
         Box(
             modifier = Modifier
                 .pullRefresh(refreshState)
@@ -138,6 +138,9 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
+        Box(
+            modifier = Modifier.padding(padding)
+        )
     }
 
 
