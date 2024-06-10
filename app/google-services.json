@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463855659162",
+    "project_id": "rug-paketnik",
+    "storage_bucket": "rug-paketnik.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463855659162:android:fdf46ea1904596ce2a9723",
+        "android_client_info": {
+          "package_name": "eu.virtusdevelops.rug_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCav9P0XB6py-RYMk94bGLb6LC1moFU5rI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
