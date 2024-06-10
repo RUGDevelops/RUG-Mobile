@@ -2,6 +2,7 @@ package eu.virtusdevelops.rug_mobile.viewModels
 
 import android.app.Application
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -211,7 +212,7 @@ class UserViewModel @Inject constructor(
 
     private fun imageToBitmap(image: Bitmap): ByteArray {
         val stream = ByteArrayOutputStream()
-        image.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        image.compress(Bitmap.CompressFormat.JPEG, 80, stream)
         return stream.toByteArray()
     }
 
