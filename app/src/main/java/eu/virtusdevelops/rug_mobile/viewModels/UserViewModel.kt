@@ -2,7 +2,6 @@ package eu.virtusdevelops.rug_mobile.viewModels
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,19 +13,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.backendapi.Api
-import eu.virtusdevelops.backendapi.Api.getErrorResponse
-import eu.virtusdevelops.backendapi.ApiRequest
-import eu.virtusdevelops.backendapi.requests.LoginRequest
-import eu.virtusdevelops.backendapi.requests.RegisterRequest
-import eu.virtusdevelops.backendapi.responses.ErrorResponse
 import eu.virtusdevelops.datalib.models.User
 import eu.virtusdevelops.rug_mobile.dataStore
+import eu.virtusdevelops.rug_mobile.domain.Result
+import eu.virtusdevelops.rug_mobile.repositories.interfaces.AuthRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
@@ -34,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val application: Application,
-    private val api: ApiRequest,
+    private val authRepository: AuthRepository,
     private val apiObject: Api
 ) : ViewModel() {
 
@@ -57,13 +51,15 @@ class UserViewModel @Inject constructor(
             loadUser()
 
             // validate login state on backend?
-            val response = api.getPackageHolders()
-            if(!response.isSuccessful){
-
-                if(response.code() == 401){
+            val result = authRepository.validateLoginState()
+            when(result){
+                is Result.Error -> {
                     isLoggedIn = false
                     val tempUser = user ?: User("", "", "", false)
                     saveUserPreferences(false, tempUser.email, tempUser.firstname, tempUser.lastname, "", false)
+                }
+                is Result.Success -> {
+
                 }
             }
             isBusy = false
@@ -80,116 +76,41 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             isBusy = true
             error = null
-
-            try {
-                val response = api.register(
-                    RegisterRequest(
-                        email,
-                        password,
-                        firstName,
-                        lastName,
-                        repeatPassword
-                    )
-                )
-
-                if (response.isSuccessful) {
+            val result = authRepository.register(
+                email,
+                firstName,
+                lastName,
+                password,
+                repeatPassword,
+                "TODO_DEVICE_TOKEN"
+            );
+            when(result){
+                is Result.Error -> {
                     isLoggedIn = false
-                    onSuccess()
-                } else {
-                    isLoggedIn = false
-
-                    val errorResponse = response.getErrorResponse<ErrorResponse>()
-                    if(errorResponse != null){
-                        error = errorResponse.errors.toString()
-                    }else{
-                        error = ""
-                    }
-
+                    error = result.error.name
                 }
-
-            } catch (ex: Exception) {
-                error = ""
-                ex.printStackTrace()
-
-            } finally {
-                isBusy = false
+                is Result.Success -> {
+                    onSuccess()
+                }
             }
+            isBusy = false
         }
     }
 
     fun loginWithImage(email: String, image: Bitmap){
         isBusy = true
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             isLoggedIn = false
 
+            val result = authRepository.imageLogin(
+                email,
+                imageToBitmap(image)
+            )
 
-            try{
-                Log.i("LOGIN", "Okay parsing image")
-                val imagePart = MultipartBody.Part.createFormData(
-                    "faceImage",
-                    "faceImage.jpg",
-                    RequestBody.create(
-                        MediaType.parse("image/*"),
-                        imageToBitmap(image)
-                    )
-                )
-
-                Log.i("LOGIN", "Okay parsing email")
-//                val emailPart = MultipartBody.Part.createFormData(
-//                    "email",
-//                    email
-//                )
-                val emailPart = RequestBody.create(MediaType.parse("multipart/form-data"), email)
-
-
-                Log.i("LOGIN", "Okay parsing device token")
-                val deviceTokenPart = RequestBody.create(MediaType.parse("multipart/form-data"), "RANDOM")
-
-                Log.i("LOGIN", "Okay sending request")
-                val response = api.faceLogin(imagePart, emailPart, deviceTokenPart)
-
-                println(response)
-
-                if (response.isSuccessful) {
-                    println("Is successful?")
-                    //2FA face recognition
-
-
-                    isLoggedIn = true
-                    val data = response.body()
-
-                    val cookies = response.headers().get("Set-Cookie")
-                    var cookie = ""
-                    if (cookies?.contains("auth_sid") == true) {
-                        cookie = cookies.split("=")[1].split(";")[0]
-                    }
-
-
-
-                    if (data != null) {
-
-                        saveUserPreferences(
-                            true,
-                            data.user.email,
-                            data.user.firstname,
-                            data.user.lastname,
-                            cookie,
-                            data.user.verified
-                        )
-                        user = data.user
-                        apiObject.setCookie(cookie)
-                    }
-
-                } else {
-                    Log.e("LOGIN", "Failed")
+            when(result){
+                is Result.Error -> {
                     isLoggedIn = false
-
-                    val errorResponse = response.getErrorResponse<ErrorResponse>()
-                    if (errorResponse != null) {
-                        error = errorResponse.errors.toString()
-                    }else{
-                        error = ""
-                    }
+                    error = result.error.name
 
                     if(user != null)
                         saveUserPreferences(false, user!!.email, user!!.firstname, user!!.lastname, "", false)
@@ -197,17 +118,29 @@ class UserViewModel @Inject constructor(
                         saveUserPreferences(false, "", "", "", "", false)
 
                     apiObject.setCookie("")
+                    Log.e("LOGIN", "Failed: ${result.error.name}")
+
                 }
-            } catch (ex: Exception) {
-                Log.e("LOGIN", "Failed with exception", ex)
-                error = ""
-            } finally {
-                isBusy = false
+                is Result.Success -> {
+                    val loginResponse = result.data
+                    val tempUser = loginResponse.user
+                    val cookie = loginResponse.cookie
+
+                    saveUserPreferences(
+                        true,
+                        tempUser.email,
+                        tempUser.firstname,
+                        tempUser.lastname,
+                        cookie,
+                        tempUser.verified
+                    )
+                    user = tempUser
+                    apiObject.setCookie(cookie)
+                    isLoggedIn = true
+                }
             }
-
+            isBusy = false
         }
-
-
     }
 
     private fun imageToBitmap(image: Bitmap): ByteArray {
@@ -227,54 +160,17 @@ class UserViewModel @Inject constructor(
             isBusy = true
             error = null
 
-            try {
 
-                val response = api.login(
-                    LoginRequest(
-                        email,
-                        password,
-                        "TODO"
-                    )
-                )
+            val result = authRepository.login(
+                email,
+                password,
+                "TODO_DEVICE_TOKEN"
+            )
 
-                if (response.isSuccessful) {
-                    //2FA face recognition
-
-
-                    isLoggedIn = true
-                    val data = response.body()
-
-                    val cookies = response.headers().get("Set-Cookie")
-                    var cookie = ""
-                    if (cookies?.contains("auth_sid") == true) {
-                        cookie = cookies.split("=")[1].split(";")[0]
-                    }
-
-
-
-                    if (data != null) {
-
-                        saveUserPreferences(
-                            true,
-                            email,
-                            data.user.firstname,
-                            data.user.lastname,
-                            cookie,
-                            data.user.verified
-                        )
-                        user = data.user
-                        apiObject.setCookie(cookie)
-                    }
-
-                } else {
+            when(result){
+                is Result.Error -> {
                     isLoggedIn = false
-
-                    val errorResponse = response.getErrorResponse<ErrorResponse>()
-                    if (errorResponse != null) {
-                        error = errorResponse.errors.toString()
-                    }else{
-                        error = ""
-                    }
+                    error = result.error.name
 
                     if(user != null)
                         saveUserPreferences(false, user!!.email, user!!.firstname, user!!.lastname, "", false)
@@ -282,36 +178,51 @@ class UserViewModel @Inject constructor(
                         saveUserPreferences(false, "", "", "", "", false)
 
                     apiObject.setCookie("")
-                }
-            } catch (ex: Exception) {
-                error = ""
-                ex.printStackTrace()
-            } finally {
-                isBusy = false
-            }
+                    Log.e("LOGIN", "Failed: ${result.error.name}")
 
+                }
+                is Result.Success -> {
+                    isLoggedIn = true
+                    val loginResponse = result.data
+                    val tempUser = loginResponse.user
+                    val cookie = loginResponse.cookie
+
+                    saveUserPreferences(
+                        true,
+                        tempUser.email,
+                        tempUser.firstname,
+                        tempUser.lastname,
+                        cookie,
+                        tempUser.verified
+                    )
+
+                    user = tempUser
+                    apiObject.setCookie(cookie)
+                }
+            }
+            isBusy = false
         }
     }
 
     fun logout(onSuccess: () -> Unit) {
         viewModelScope.launch {
             isBusy = true
-            try {
-                val response = api.logout()
 
-                if (response.isSuccessful) {
+            val result = authRepository.logout()
+
+            when(result){
+                is Result.Success -> {
                     isLoggedIn = false
                     user = null
                     saveUserPreferences(false, "", "", "", "", false)
                     apiObject.setCookie("")
                     onSuccess()
                 }
-                
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-            } finally {
-                isBusy = false
+                is Result.Error -> {
+                    Log.e("AUTH", result.error.name)
+                }
             }
+            isBusy = false;
         }
     }
 

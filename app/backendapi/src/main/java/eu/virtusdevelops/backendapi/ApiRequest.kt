@@ -4,23 +4,24 @@ import eu.virtusdevelops.backendapi.requests.ChangeDeviceTokenRequest
 import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
+import eu.virtusdevelops.backendapi.responses.LoginData
 import eu.virtusdevelops.backendapi.responses.LoginResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
 import eu.virtusdevelops.backendapi.responses.PackageVerifyResponse
-import eu.virtusdevelops.backendapi.responses.RegisterResponse
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.SessionInformation
+import eu.virtusdevelops.datalib.models.User
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
-import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
@@ -35,7 +36,7 @@ interface ApiRequest {
 
     @Headers("Content-Type: application/json")
     @POST("auth/register")
-    suspend fun register(@Body registerRequest: RegisterRequest): Response<RegisterResponse>
+    suspend fun register(@Body registerRequest: RegisterRequest): Response<User>
 
     @Headers("Content-Type: application/json")
     @POST("auth/login")
@@ -55,6 +56,10 @@ interface ApiRequest {
     @Headers("Content-Type: application/json")
     @GET("package_holder")
     suspend fun getPackageHolders(): Response<List<PackageHolder>>
+
+    @Headers("Content-Type: application/json")
+    @DELETE("package_holder")
+    suspend fun deletePackageHolder(@Path("id") id: Int): Response<Boolean>
 
 
     @Headers("Content-Type: application/json")
