@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import eu.virtusdevelops.rug_mobile.R
 import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Graph
@@ -106,6 +107,9 @@ fun SettingsScreen(navController: NavController, innerPaddingValues: PaddingValu
                         ),
                         onClick = {
                             // todo: open change pass menu
+                            navController.navigate(AuthGraph.ChangePasswordScreen.route){
+                                popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                            }
                         }) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),

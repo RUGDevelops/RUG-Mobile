@@ -13,6 +13,7 @@ import eu.virtusdevelops.rug_mobile.screens.CameraPreviewScreen
 import eu.virtusdevelops.rug_mobile.screens.SettingsScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.ActiveSessionsList
 import eu.virtusdevelops.rug_mobile.screens.auth.FaceLoginScreen
+import eu.virtusdevelops.rug_mobile.screens.auth.ChangePasswordScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.SplashScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.LoginScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.PendingSessionsList
@@ -119,6 +120,9 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController, innerPadding:
         }
         composable(AuthGraph.RegisterScreen.route){
             RegisterScreen(navController)
+        }
+        composable(AuthGraph.ChangePasswordScreen.route) {
+            ChangePasswordScreen(navController)
         }
         composable(AuthGraph.SplashScreen.route){
             SplashScreen(navController)

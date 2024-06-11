@@ -198,7 +198,10 @@ fun RegisterScreen(
                 if (viewModel.isBusy) {
                     CircularProgressIndicator()
                 } else {
-                    Text("Register")
+                    Text(
+                        text = "Register",
+                        fontWeight = FontWeight.Bold
+                        )
                 }
             }
 

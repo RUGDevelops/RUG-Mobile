@@ -45,7 +45,6 @@ import eu.virtusdevelops.rug_mobile.screens.GradientBackground
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 
-
 @Composable
 fun LoginScreen(
     navController: NavController,
@@ -140,7 +139,10 @@ fun LoginScreen(
                             popUpTo(navController.graph.id)
                         }
                     }else{
-                        Text("Login")
+                        Text(
+                            text = "Login",
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
                 }
