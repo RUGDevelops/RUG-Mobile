@@ -10,7 +10,9 @@ import eu.virtusdevelops.rug_mobile.repositories.AuthRepositoryImpl
 import eu.virtusdevelops.rug_mobile.repositories.PackageHolderRepositoryImpl
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageHolderRepository
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
-import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepositoryImpl
+import eu.virtusdevelops.rug_mobile.repositories.PackageRepositoryImpl
+import eu.virtusdevelops.rug_mobile.repositories.SessionRepositoryImpl
+import eu.virtusdevelops.rug_mobile.repositories.interfaces.SessionRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -29,6 +31,11 @@ object FactoriesModule {
     @Provides
     fun packagesRepository(api: ApiRequest): PackageRepository{
         return PackageRepositoryImpl(api)
+    }
+
+    @Provides
+    fun sessionsRepository(api: ApiRequest): SessionRepository{
+        return SessionRepositoryImpl(api)
     }
 
 }

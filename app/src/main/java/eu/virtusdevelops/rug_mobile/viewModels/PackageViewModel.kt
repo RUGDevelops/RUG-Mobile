@@ -14,7 +14,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
-import eu.virtusdevelops.rug_mobile.repositories.PackagesRepository
+import eu.virtusdevelops.rug_mobile.domain.Result
+import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -23,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel(assistedFactory = PackageViewModel.PackageViewModelFactory::class)
 class PackageViewModel @AssistedInject constructor(
     private val application: Application,
-    private val repository: PackagesRepository,
+    private val repository: PackageRepository,
     @Assisted
     private val packageID: UUID
 ): ViewModel(){
@@ -35,7 +36,6 @@ class PackageViewModel @AssistedInject constructor(
 
     var openSound by mutableStateOf("")
     var isOpenError by mutableStateOf(false)
-
     var isVerifyError by mutableStateOf(false)
 
 
@@ -50,65 +50,64 @@ class PackageViewModel @AssistedInject constructor(
             isBusy = true
             isError = false
             isLoaded = false
-            try{
-                val packageDetails = repository.getPackageDetails(packageID)
-                _deliveryPackage.value = packageDetails
 
-            }catch (ex :Exception){
-                isError = true
-                ex.printStackTrace()
-            }finally {
-                isBusy = false
-                isLoaded = true
+            when(val result = repository.getPackageDetails(packageID)){
+                is Result.Error -> {
+                    isError = true
+                }
+                is Result.Success -> {
+                    _deliveryPackage.value = result.data
+                }
             }
+
+            isBusy = false
+            isLoaded = true
+
         }
     }
 
 
     fun openPackageHolder(onSuccess: () -> Unit){
+
         viewModelScope.launch {
             isBusy = true
             isOpenError = false
 
-            try{
-                val openResponse = repository.getOpenSound(packageID)
-
-                if(openResponse != null){
-                    openSound = openResponse.data
-                    onSuccess()
-                }else{
+            when(val result = repository.getDepositSound(packageID)){
+                is Result.Error -> {
                     isOpenError = true
                 }
+                is Result.Success -> {
+                    openSound = result.data
 
-            }catch (ex :Exception){
-                isOpenError = true
-            }finally {
-                isBusy = false
+                    onSuccess()
+
+                }
             }
+
+            isBusy = false
+
         }
     }
 
 
     fun verifySendPackage(){
+
         viewModelScope.launch {
             isBusy = true
             isVerifyError = false
 
-            try{
-                val openResponse = repository.verifyPackageSend(packageID)
-
-                if(openResponse != null){
-                    _deliveryPackage.value = openResponse
-
-                }else{
+            when(val result = repository.verifySendingPackage(packageID)){
+                is Result.Error -> {
                     isVerifyError = true
                 }
-
-            }catch (ex :Exception){
-                isVerifyError = true
-            }finally {
-                isBusy = false
+                is Result.Success -> {
+                    _deliveryPackage.value = result.data
+                }
             }
+
+            isBusy = false
+
         }
     }
 

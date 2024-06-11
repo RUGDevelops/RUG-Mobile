@@ -10,15 +10,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
-import eu.virtusdevelops.rug_mobile.repositories.PackagesRepository
+import eu.virtusdevelops.rug_mobile.domain.Result
+import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class IncomingPackageListViewModel @Inject constructor(
-    private val application: Application,
-    private val repository: PackagesRepository
+    private val repository: PackageRepository
 ): ViewModel(){
 
     var isBusy by mutableStateOf(false)
@@ -36,16 +36,19 @@ class IncomingPackageListViewModel @Inject constructor(
             isBusy = true
             isError = false
             isLoaded = false
-            try{
-                val holders = repository.getIncomingPackages()
-                _deliveryPackages.value = holders
-            }catch (ex :Exception){
-                isError = true
-                ex.printStackTrace()
-            }finally {
-                isBusy = false
-                isLoaded = true
+
+            when(val result = repository.getIncomingPackages()){
+                is Result.Error -> {
+                    isError = true
+                }
+                is Result.Success -> {
+                    _deliveryPackages.value = result.data
+                }
             }
+
+            isBusy = false
+            isLoaded = true
+
         }
     }
 

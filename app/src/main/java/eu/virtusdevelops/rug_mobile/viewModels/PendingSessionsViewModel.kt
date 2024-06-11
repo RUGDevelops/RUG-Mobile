@@ -1,6 +1,7 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,7 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.datalib.models.SessionInformation
-import eu.virtusdevelops.rug_mobile.repositories.SessionsRepository
+import eu.virtusdevelops.rug_mobile.domain.Result
+import eu.virtusdevelops.rug_mobile.repositories.interfaces.SessionRepository
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -18,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PendingSessionsViewModel @Inject constructor(
-    private val repository: SessionsRepository
+    private val repository: SessionRepository
 ): ViewModel(){
     var isBusy by mutableStateOf(false)
     var isError by mutableStateOf(false)
@@ -37,15 +39,25 @@ class PendingSessionsViewModel @Inject constructor(
             isBusy = true
             isError = false
             isLoaded = false
-            try{
-                val sessions = repository.getPendingSessions()
-                _sessions.value = sessions
-            }catch (ex :Exception){
+
+            loadSessions()
+
+            isBusy = false
+            isLoaded = true
+        }
+    }
+
+
+    private suspend fun loadSessions(){
+        val result = repository.getPendingSessions()
+
+        when(result){
+            is Result.Error -> {
                 isError = true
-                ex.printStackTrace()
-            }finally {
-                isBusy = false
-                isLoaded = true
+                Log.e("SESSIONS", result.error.name)
+            }
+            is Result.Success -> {
+                _sessions.value = result.data
             }
         }
     }
@@ -55,27 +67,20 @@ class PendingSessionsViewModel @Inject constructor(
         viewModelScope.launch {
             isBusyLogingOut = true
             isErrorLogout = false
-            try{
-                val response = repository.approveSession(sessionID)
-                if(response){
-                    isErrorLogout = false
-
-                    //
-                    val sessions = repository.getPendingSessions()
-                    _sessions.value = sessions
 
 
-                }else{
+            val result = repository.approveSession(sessionID)
+
+            when(result){
+                is Result.Error -> {
                     isErrorLogout = true
+                    Log.e("SESSIONS", result.error.name)
                 }
-
-
-
-            }catch (ex: Exception){
-                isErrorLogout = true
-            }finally {
-                isBusyLogingOut = false
+                is Result.Success -> {
+                    loadSessions()
+                }
             }
+            isBusyLogingOut = false
         }
     }
 
@@ -83,27 +88,20 @@ class PendingSessionsViewModel @Inject constructor(
         viewModelScope.launch {
             isBusyLogingOut = true
             isErrorLogout = false
-            try{
-                val response = repository.declineSession(sessionID)
-                if(response){
-                    isErrorLogout = false
-
-                    //
-                    val sessions = repository.getPendingSessions()
-                    _sessions.value = sessions
 
 
-                }else{
+            val result = repository.declineSession(sessionID)
+
+            when(result){
+                is Result.Error -> {
                     isErrorLogout = true
+                    Log.e("SESSIONS", result.error.name)
                 }
-
-
-
-            }catch (ex: Exception){
-                isErrorLogout = true
-            }finally {
-                isBusyLogingOut = false
+                is Result.Success -> {
+                    loadSessions()
+                }
             }
+            isBusyLogingOut = false
         }
     }
 
