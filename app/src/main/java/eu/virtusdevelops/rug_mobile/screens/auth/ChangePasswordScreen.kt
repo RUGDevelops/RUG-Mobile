@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -26,6 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,6 +48,9 @@ fun ChangePasswordScreen(
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
+    var passwordVisibility by remember { mutableStateOf(false) }
+    var newPasswordVisibility by remember { mutableStateOf(false) }
 
     var isError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(PasswordValidationState()) }
@@ -88,21 +95,28 @@ fun ChangePasswordScreen(
                     label = { Text("Old password") },
                     placeholder = { Text("Your old password here") },
                     singleLine = true,
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = modifier,
                     isError = isError,
                     leadingIcon = {
-                        Icon(Icons.Filled.Person, contentDescription = "Username")
-                    })
+                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                            Icon(Icons.Filled.Lock, contentDescription = "Toggle old password visibility")
+                        }
+                    }
+                )
                 TextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
                     label = { Text("New password") },
                     placeholder = { Text("Your new password here") },
                     singleLine = true,
+                    visualTransformation = if (newPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = modifier,
                     isError = isError,
                     leadingIcon = {
-                        Icon(Icons.Filled.Person, contentDescription = "Username")
+                        IconButton(onClick = { newPasswordVisibility = !newPasswordVisibility }) {
+                            Icon(Icons.Filled.Lock, contentDescription = "Toggle password visibility")
+                        }
                     }
                 )
                 TextField(
@@ -111,10 +125,13 @@ fun ChangePasswordScreen(
                     label = { Text("Confirm password") },
                     placeholder = { Text("Confirm your new password here") },
                     singleLine = true,
+                    visualTransformation = if (newPasswordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
                     modifier = modifier,
                     isError = isError,
                     leadingIcon = {
-                        Icon(Icons.Filled.Person, contentDescription = "Username")
+                        IconButton(onClick = { newPasswordVisibility = !newPasswordVisibility }) {
+                            Icon(Icons.Filled.Lock, contentDescription = "Toggle new password visibility")
+                        }
                     }
                 )
 

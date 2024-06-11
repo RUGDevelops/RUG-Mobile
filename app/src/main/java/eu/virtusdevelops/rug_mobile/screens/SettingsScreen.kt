@@ -106,7 +106,6 @@ fun SettingsScreen(navController: NavController, innerPaddingValues: PaddingValu
                             containerColor = Color.Transparent
                         ),
                         onClick = {
-                            // todo: open change pass menu
                             navController.navigate(AuthGraph.ChangePasswordScreen.route){
                                 popUpTo(navController.graph.startDestinationId) { inclusive = false }
                             }
