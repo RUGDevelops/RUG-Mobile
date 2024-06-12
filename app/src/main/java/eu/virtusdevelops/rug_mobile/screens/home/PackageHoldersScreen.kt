@@ -94,58 +94,45 @@ fun PackageHoldersScreen(
         onRefresh = { packageHolderViewModel.load() }
     )
 
-    Scaffold(
 
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.AddPackageHolderScreen.route)
-                },
-                modifier = Modifier.padding(innerPaddingValues)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Send")
-            }
-        }
-    )
-    { padding ->
-        Box(
+    Box(
+        modifier = Modifier
+            .pullRefresh(refreshState)
+            .padding(innerPaddingValues)
+    ) {
+        Column(
             modifier = Modifier
-                .pullRefresh(refreshState)
-                .padding(innerPaddingValues)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                if (isBusy) {
-                    CircularProgressIndicator()
-                } else if (isError) {
-                    Text(text = "An error occurred. Please try again.")
+            if (isBusy) {
+                CircularProgressIndicator()
+            } else if (isError) {
+                Text(text = "An error occurred. Please try again.")
+            } else {
+                if (packageHolders.isEmpty()) {
+                    Text(text = "No package holders found.")
                 } else {
-                    if (packageHolders.isEmpty()) {
-                        Text(text = "No package holders found.")
-                    } else {
-                        ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
-                    }
+                    ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .pullRefresh(refreshState),
-            contentAlignment = Alignment.TopCenter
-        ) {
-
-            PullRefreshIndicator(
-                refreshing = isBusy,
-                state = refreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-        }
     }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .pullRefresh(refreshState),
+        contentAlignment = Alignment.TopCenter
+    ) {
+
+        PullRefreshIndicator(
+            refreshing = isBusy,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+
 
 }
 

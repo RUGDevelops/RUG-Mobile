@@ -152,7 +152,6 @@ fun PendingSessionCard(session: SessionInformation, viewModel: PendingSessionsVi
             )
         }
         IconButton(onClick = {
-            // TODO: kick session
             viewModel.declineSession(session.id)
         }) {
             Icon(
@@ -163,7 +162,6 @@ fun PendingSessionCard(session: SessionInformation, viewModel: PendingSessionsVi
             )
         }
         IconButton(onClick = {
-            // TODO: kick session
             viewModel.approveSession(session.id)
         }) {
             Icon(

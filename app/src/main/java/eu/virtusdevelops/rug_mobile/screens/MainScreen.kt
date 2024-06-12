@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,6 +79,9 @@ fun MainScreen(
         topBar = {
             TopNavBar(navController, viewModel)
         },
+        floatingActionButton = {
+            FloatingBar(navController = navController)
+        },
 //        floatingActionButton = {
 //            FloatingActionButton(onClick = { presses++ }) {
 //                Icon(Icons.Default.Add, contentDescription = "Send")
@@ -94,7 +98,33 @@ fun MainScreen(
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FloatingBar(navController: NavController){
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    if(currentDestination?.route == Screen.PackagesOutListScreen.route){
+        androidx.compose.material3.FloatingActionButton(
+            onClick = {
+                navController.navigate(Screen.SendPackage.route)
+            },
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Send")
+        }
+    }else if(currentDestination?.route == Screen.PackageHoldersScreen.route){
+        androidx.compose.material3.FloatingActionButton(
+            onClick = {
+                navController.navigate(Screen.AddPackageHolderScreen.route)
+            },
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add")
+        }
+    }
+
+}
+
+
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
@@ -135,6 +165,8 @@ fun TopNavBar(navController: NavHostController, viewModel: UserViewModel){
 
     if(currentDestination?.route == Screen.SendPackage.route){
         CustomTopbar("Send package", navController)
+    }else if(currentDestination?.route == Screen.AddPackageHolderScreen.route){
+        CustomTopbar("Add Package Holder", navController)
     }else if(currentDestination?.route == Screen.SettingsScreen.route){
         CustomTopbar("Settings", navController)
     }else if(currentDestination?.route == AuthGraph.PendingSessionsScreen.route){

@@ -85,7 +85,7 @@ fun NavGraphBuilder.packagesNavGraph(navController: NavHostController, innerPadd
             SendPackageView(navController = navController, paddingValues = innerPadding)
         }
         composable(Screen.AddPackageHolderScreen.route) {
-            PackageHolderAddScreen(navController = navController)
+            PackageHolderAddScreen(navController = navController, innerPadding)
         }
 
 

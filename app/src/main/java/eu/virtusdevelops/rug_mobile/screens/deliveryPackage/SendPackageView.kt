@@ -302,23 +302,6 @@ fun SendPackageView(
                         )
                     }
                 }
-                Button(
-                    shape = RoundedCornerShape(10.dp),
-                    onClick = {
-                        navController.popBackStack()
-                    },
-                    modifier = modifier
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
-                    Text(
-                        text = "Cancel",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
             }
         }
     }

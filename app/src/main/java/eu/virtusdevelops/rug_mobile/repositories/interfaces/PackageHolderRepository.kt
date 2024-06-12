@@ -11,5 +11,5 @@ interface PackageHolderRepository {
     suspend  fun getPackageHolders(): Result<List<PackageHolder>, DataError.Network>
     suspend fun getPackageHolderOpenSound(packageHolderID: Int): Result<String, DataError.Network>
     suspend fun deletePackageHolder(packageHolderID: Int): Result<Boolean, DataError.Network>
-    suspend fun addPackageHolder(packageHolderID: Int): Result<PackageHolder, DataError.Network>
+    suspend fun addPackageHolder(packageHolderID: Int, isPublic: Boolean): Result<PackageHolder, DataError.Network>
 }

@@ -126,11 +126,47 @@ class PackageRepositoryImpl @Inject constructor(
     }
 
     override suspend fun verifySendingPackage(packageID: UUID): Result<DeliveryPackage, DataError.Network> {
-        TODO("Not yet implemented")
+        try{
+            val response = api.verifyPackageSend(packageID)
+
+            if(response.body() != null){
+                val body = response.body()!!
+                return Result.Success(body.packageData)
+            }
+
+
+        }catch (e : HttpException){
+            return when(e.code()) {
+                400 -> Result.Error(DataError.Network.BAD_REQUEST)
+                408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+                413 -> Result.Error(DataError.Network.PAYLOAD_TOO_LARGE)
+                else -> Result.Error(DataError.Network.UNKNOWN)
+            }
+        }
+
+        return Result.Error(DataError.Network.UNKNOWN)
     }
 
     override suspend fun claimPackage(packageID: UUID): Result<String, DataError.Network> {
-        TODO("Not yet implemented")
+        try{
+            val response = api.claimPackage(packageID)
+
+            if(response.body() != null){
+                val body = response.body()!!
+                return Result.Success(body.openToken)
+            }
+
+
+        }catch (e : HttpException){
+            return when(e.code()) {
+                400 -> Result.Error(DataError.Network.BAD_REQUEST)
+                408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+                413 -> Result.Error(DataError.Network.PAYLOAD_TOO_LARGE)
+                else -> Result.Error(DataError.Network.UNKNOWN)
+            }
+        }
+
+        return Result.Error(DataError.Network.UNKNOWN)
     }
 
     override suspend fun deliveryPickup(packageID: UUID): Result<String, DataError.Network> {
