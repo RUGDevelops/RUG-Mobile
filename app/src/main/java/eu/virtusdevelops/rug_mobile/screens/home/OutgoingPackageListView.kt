@@ -55,7 +55,6 @@ import eu.virtusdevelops.rug_mobile.viewModels.OutgoingPackageListViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OutgoingPackageListView(navController: NavController, innerPaddingValues: PaddingValues) {

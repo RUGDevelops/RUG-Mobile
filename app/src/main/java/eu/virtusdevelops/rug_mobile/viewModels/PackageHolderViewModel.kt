@@ -12,11 +12,11 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import eu.virtusdevelops.backendapi.Api
 import eu.virtusdevelops.datalib.models.PackageHolder
-import eu.virtusdevelops.rug_mobile.repositories.PackageHolderRepository
+import eu.virtusdevelops.rug_mobile.domain.Result
+import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageHolderRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 
 @HiltViewModel(assistedFactory = PackageHolderViewModel.PackageHolderViewModelFactory::class)
@@ -35,25 +35,27 @@ class PackageHolderViewModel  @AssistedInject constructor(
 
     fun load(){
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             isBusy = true
             isLoaded = false
-            try{
-                val data = repository.getPackageHolderWithHistory(packageHolderID)
-                println("Data: $data")
-                if(data == null){
-                    isError = true
-                }else{
-                    _packageHolder.value = data!!
+
+            when(val result = repository.getPackageHolderWithHistory(packageHolderID)){
+                is Result.Success -> {
+
+                    viewModelScope.launch {
+                        _packageHolder.value = result.data
+                    }
+
+
                 }
-            }catch (ex: Exception){
-
-                isError = true
-
-            }finally {
-                isBusy = false
-                isLoaded = true
+                is Result.Error -> {
+                    isError = true
+                }
             }
+
+            isBusy = false
+            isLoaded = true
+
         }
     }
 

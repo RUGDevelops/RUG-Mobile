@@ -219,20 +219,6 @@ private fun parseQrResult(qrData: String) {
                 Log.d("URL_COMPONENT", component)
             }
 
-//            makeApiRequest(
-//                Box(
-//                    deliveryId = deliveryId,
-//                    boxId = boxId.toString().trimStart('0').toInt(),
-//                    tokenFormat = 2,
-//                    latitude = latitude,
-//                    longitude = longitude,
-//                    qrCodeInfo = "string",
-//                    terminalSeed = terminalSeed,
-//                    isMultibox = false,
-//                    doorIndex = doorIndex,
-//                    addAccessLog = true
-//                )
-//            )
         } else {
             Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
         }

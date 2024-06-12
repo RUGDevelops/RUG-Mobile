@@ -33,7 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import eu.virtusdevelops.rug_mobile.R
+import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 
@@ -104,7 +106,9 @@ fun SettingsScreen(navController: NavController, innerPaddingValues: PaddingValu
                             containerColor = Color.Transparent
                         ),
                         onClick = {
-                            // todo: open change pass menu
+                            navController.navigate(AuthGraph.ChangePasswordScreen.route){
+                                popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                            }
                         }) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
@@ -120,10 +124,28 @@ fun SettingsScreen(navController: NavController, innerPaddingValues: PaddingValu
                         ),
                         onClick = {
                             // todo: open sessions menu
+                            navController.navigate(AuthGraph.ActiveSessionScreen.route)
                         }) {
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = "Sessions",
+                            text = "Active sessions",
+                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
+                        )
+                    }
+
+
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
+                        ),
+                        onClick = {
+                            // todo: open sessions menu
+                            navController.navigate(AuthGraph.PendingSessionsScreen.route)
+                        }) {
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Pending sessions",
                             style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
                         )
                     }
@@ -143,6 +165,32 @@ fun SettingsScreen(navController: NavController, innerPaddingValues: PaddingValu
             ) {
 
                 Column(modifier = Modifier.padding(8.dp)) {
+
+
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
+                        ),
+                        onClick = {
+                            // todo: open 2fa setup menu
+
+
+
+                        }) {
+                        Icon(
+                            painterResource(id = R.drawable.gear_solid),
+                            modifier = Modifier.size(26.dp),
+                            contentDescription = "Setup 2FA",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = "Setup 2FA",
+                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
+                        )
+                    }
 
                     Button(
                         modifier = Modifier.fillMaxWidth(),

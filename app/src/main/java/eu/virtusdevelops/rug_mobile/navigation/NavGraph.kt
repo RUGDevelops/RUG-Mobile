@@ -11,8 +11,12 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import eu.virtusdevelops.rug_mobile.screens.CameraPreviewScreen
 import eu.virtusdevelops.rug_mobile.screens.SettingsScreen
+import eu.virtusdevelops.rug_mobile.screens.auth.ActiveSessionsList
+import eu.virtusdevelops.rug_mobile.screens.auth.FaceLoginScreen
+import eu.virtusdevelops.rug_mobile.screens.auth.ChangePasswordScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.SplashScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.LoginScreen
+import eu.virtusdevelops.rug_mobile.screens.auth.PendingSessionsList
 import eu.virtusdevelops.rug_mobile.screens.home.PackageHolderScreen
 import eu.virtusdevelops.rug_mobile.screens.home.PackageHoldersScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.RegisterScreen
@@ -23,7 +27,6 @@ import eu.virtusdevelops.rug_mobile.screens.home.OutgoingPackageListView
 import eu.virtusdevelops.rug_mobile.screens.home.IncomingPackageListView
 import java.util.UUID
 
-
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
@@ -33,7 +36,7 @@ fun SetupNavGraph(
         navController = navController,
         startDestination = Graph.AUTHENTICATION,
     ) {
-        authNavGraph(navController)
+        authNavGraph(navController, innerPadding)
         mainNavGraph(navController, innerPadding)
     }
 }
@@ -103,7 +106,7 @@ fun NavGraphBuilder.packagesNavGraph(navController: NavHostController, innerPadd
 }
 
 
-fun NavGraphBuilder.authNavGraph(navController: NavHostController){
+fun NavGraphBuilder.authNavGraph(navController: NavHostController, innerPadding: PaddingValues){
     navigation(
         route = Graph.AUTHENTICATION,
         startDestination = AuthGraph.SplashScreen.route
@@ -111,14 +114,26 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController){
         composable(AuthGraph.LoginScreen.route) {
             LoginScreen(navController)
         }
+        composable(AuthGraph.FaceLoginScreen.route){
+            FaceLoginScreen(navController = navController, innerPadding)
+        }
         composable(AuthGraph.RegisterScreen.route){
             RegisterScreen(navController)
+        }
+        composable(AuthGraph.ChangePasswordScreen.route) {
+            ChangePasswordScreen(navController)
         }
         composable(AuthGraph.SplashScreen.route){
             SplashScreen(navController)
         }
         composable(AuthGraph.CameraPreviewScreen.route) {
             CameraPreviewScreen(navController)
+        }
+        composable(AuthGraph.ActiveSessionScreen.route){
+            ActiveSessionsList(navController = navController, innerPaddingValues = innerPadding)
+        }
+        composable(AuthGraph.PendingSessionsScreen.route){
+            PendingSessionsList(navController = navController, innerPaddingValues = innerPadding)
         }
     }
 }

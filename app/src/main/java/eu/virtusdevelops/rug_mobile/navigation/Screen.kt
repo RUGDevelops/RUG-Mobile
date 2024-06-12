@@ -32,7 +32,11 @@ sealed class Screen(val route: String, val icon: Int, val name: String) {
 
 sealed class AuthGraph(val route:String){
     data object LoginScreen : AuthGraph("login")
+    data object FaceLoginScreen : AuthGraph("face_login")
     data object RegisterScreen : AuthGraph("register")
+    data object ChangePasswordScreen : AuthGraph("change_password")
     data object SplashScreen : AuthGraph("splash")
     data object CameraPreviewScreen : AuthGraph("camera_preview")
+    data object ActiveSessionScreen : AuthGraph("active_sessions")
+    data object PendingSessionsScreen : AuthGraph("pending_sessions")
 }
