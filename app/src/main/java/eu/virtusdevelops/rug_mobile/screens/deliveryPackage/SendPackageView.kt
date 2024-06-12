@@ -1,19 +1,25 @@
 package eu.virtusdevelops.rug_mobile.screens.deliveryPackage
 
-import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsEndWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
@@ -25,13 +31,24 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -44,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import eu.virtusdevelops.rug_mobile.R
 import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.navigation.Screen
@@ -72,7 +90,7 @@ fun SendPackageView(
         .padding(2.dp)
         .fillMaxWidth()
 
-    var viewModel = hiltViewModel<OutgoingPackageListViewModel>()
+    // var viewModel = hiltViewModel<OutgoingPackageListViewModel>()
 
     Column(
         modifier = Modifier
@@ -96,7 +114,8 @@ fun SendPackageView(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = modifier
+                modifier = modifier,
+                singleLine = true
             )
 
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -104,28 +123,69 @@ fun SendPackageView(
                     value = firstName,
                     onValueChange = { firstName = it },
                     label = { Text("First name") },
-                    modifier = modifier.weight(1f)
+                    modifier = modifier.weight(1f),
+                    singleLine = true
                 )
                 TextField(
                     value = lastName,
                     onValueChange = { lastName = it },
                     label = { Text("Last name") },
-                    modifier = modifier.weight(1f)
+                    modifier = modifier.weight(1f),
+                    singleLine = true
                 )
             }
 
-            TextField(
-                value = packageHolder,
-                onValueChange = { packageHolder = it },
-                label = { Text("Select package holder") },
-                modifier = modifier
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(IntrinsicSize.Min)
+            ) {
+                TextField(
+                    value = packageHolder,
+                    onValueChange = { packageHolder = it },
+                    label = { Text("Select package holder") },
+                    modifier = modifier.weight(1f),
+                    singleLine = true
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(0.2f)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    IconButton(
+                        onClick = {
+
+                        },
+                        modifier = modifier
+                            // .align(Alignment.CenterVertically)
+                            .fillMaxHeight()
+                            //.weight(0.2f)
+                            .background(
+                                TextFieldDefaults.colors().unfocusedContainerColor,
+                                RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
+                            ),
+                        content = {
+                            Icon(
+                                modifier = Modifier.padding(10.dp),
+                                imageVector = ImageVector.vectorResource(R.drawable.qrcode_solid),
+                                contentDescription = "qr code scanner"
+                            )
+                        },
+                    )
+                    Divider(
+                        color = Color.Black,
+                        thickness = 1.dp,
+                        modifier = modifier
+                            .align(Alignment.BottomCenter)
+                    )
+                }
+            }
 
             TextField(
                 value = streetAddress,
                 onValueChange = { streetAddress = it },
                 label = { Text("Street address") },
-                modifier = modifier
+                modifier = modifier,
+                singleLine = true
             )
 
             Row(modifier = Modifier.fillMaxWidth()) {
@@ -133,13 +193,15 @@ fun SendPackageView(
                     value = houseNumber,
                     onValueChange = { houseNumber = it },
                     label = { Text("House number") },
-                    modifier = modifier.weight(1f)
+                    modifier = modifier.weight(1f),
+                    singleLine = true
                 )
                 TextField(
                     value = postNumber,
                     onValueChange = { postNumber = it },
                     label = { Text("Post number") },
-                    modifier = modifier.weight(1f)
+                    modifier = modifier.weight(1f),
+                    singleLine = true
                 )
             }
 
@@ -147,14 +209,16 @@ fun SendPackageView(
                 value = city,
                 onValueChange = { city = it },
                 label = { Text("City") },
-                modifier = modifier
+                modifier = modifier,
+                singleLine = true
             )
 
             TextField(
                 value = country,
                 onValueChange = { country = it },
                 label = { Text("Country") },
-                modifier = modifier
+                modifier = modifier,
+                singleLine = true
             )
         }
 
@@ -165,24 +229,24 @@ fun SendPackageView(
             Button(
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
-                    viewModel.addOutgoingPackage(
-                        email,
-                        firstName,
-                        lastName,
-                        packageHolder,
-                        streetAddress,
-                        houseNumber,
-                        postNumber,
-                        city,
-                        country
-                    ) {
-                        Toast.makeText(
-                            navController.context,
-                            "Created package successfully!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        navController.popBackStack()
-                    }
+//                     viewModel.addOutgoingPackage(
+//                        email,
+//                        firstName,
+//                        lastName,
+//                        packageHolder,
+//                        streetAddress,
+//                        houseNumber,
+//                        postNumber,
+//                        city,
+//                        country
+//                    ) {
+//                        Toast.makeText(
+//                            navController.context,
+//                            "Created package successfully!",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        navController.popBackStack()
+//                    }
                 },
                 modifier = modifier
                     .height(50.dp),
@@ -191,10 +255,9 @@ fun SendPackageView(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                if (viewModel.isBusy) {
+                if (false /*viewModel.isBusy*/) {
                     CircularProgressIndicator()
-                }
-                else {
+                } else {
                     Text(
                         text = "Create package",
                         fontWeight = FontWeight.Bold
@@ -227,3 +290,4 @@ fun SendPackageView(
 fun SendPackageViewPreview() {
     SendPackageView(rememberNavController(), PaddingValues(0.dp))
 }
+
