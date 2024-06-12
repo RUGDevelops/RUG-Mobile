@@ -149,14 +149,12 @@ class PackageRepositoryImpl @Inject constructor(
 
     override suspend fun claimPackage(packageID: UUID): Result<String, DataError.Network> {
         try{
-//            val response = api.claimPackage(packageID)
-//
-//            if(response.body() != null){
-//                val body = response.body()!!
-//                return Result.Success(body.openToken)
-//            }
+            val response = api.claimPackage(packageID)
 
-
+            if(response.body() != null){
+                val body = response.body()!!
+                return Result.Success(body.openToken)
+            }
         }catch (e : HttpException){
             return when(e.code()) {
                 400 -> Result.Error(DataError.Network.BAD_REQUEST)
