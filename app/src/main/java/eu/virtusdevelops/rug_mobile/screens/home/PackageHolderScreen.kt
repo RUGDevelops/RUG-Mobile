@@ -81,73 +81,52 @@ fun PackageHolderScreen(navController: NavController
         onRefresh = { viewModel.load() }
     )
 
-    Scaffold(
-//        modifier = Modifier.padding(innerPaddingValues),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "History",
-                        fontWeight = FontWeight.Bold,)
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                navigationIcon =  {
-                    IconButton(onClick = {
-                        navController.navigateUp()
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
+
+    Box(modifier = Modifier.padding(innerPaddingValues)){
+        if(isBusy){
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+
+        Row(
+            modifier = Modifier.pullRefresh(refreshState)
+        ){
+            if (viewModel.packageHolder.value != null) {
+                // display packageholder
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+
+                ) {
+                    PackageHolderInfo(viewModel.packageHolder.value!!)
+                    PackageHolderHistory(viewModel.packageHolder.value!!)
                 }
+
+            } else if(isError ){
+                Text(text = "Error occured, please try again")
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pullRefresh(refreshState),
+            contentAlignment = Alignment.TopCenter){
+
+            PullRefreshIndicator(
+                refreshing = isBusy,
+                state = refreshState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
             )
         }
-    ) {paddingValues -> 
-        Box(modifier = Modifier.padding(paddingValues)){
-            if(isBusy){
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
-
-            Row(
-                modifier = Modifier.pullRefresh(refreshState)
-            ){
-                if (viewModel.packageHolder.value != null) {
-                    // display packageholder
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp)
-
-                    ) {
-                        PackageHolderInfo(viewModel.packageHolder.value!!)
-                        PackageHolderHistory(viewModel.packageHolder.value!!)
-                    }
-
-                } else if(isError ){
-                    Text(text = "Error occured, please try again")
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .pullRefresh(refreshState),
-                contentAlignment = Alignment.TopCenter){
-
-                PullRefreshIndicator(
-                    refreshing = isBusy,
-                    state = refreshState,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                )
-            }
-        }
     }
+
     
     
 

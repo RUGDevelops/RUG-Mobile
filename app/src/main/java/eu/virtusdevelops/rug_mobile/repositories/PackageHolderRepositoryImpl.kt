@@ -1,6 +1,7 @@
 package eu.virtusdevelops.rug_mobile.repositories
 
 import eu.virtusdevelops.backendapi.ApiRequest
+import eu.virtusdevelops.backendapi.requests.AddPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.PackageHolderAction
@@ -138,8 +139,28 @@ class PackageHolderRepositoryImpl @Inject constructor(
         return Result.Error(DataError.Network.UNKNOWN)
     }
 
-    override suspend fun addPackageHolder(packageHolderID: Int): Result<PackageHolder, DataError.Network> {
-        TODO("Not yet implemented")
+    override suspend fun addPackageHolder(packageHolderID: Int, isPublic: Boolean): Result<PackageHolder, DataError.Network> {
+        try{
+            val response = api.addPackageHolder(AddPackageHolderRequest(
+                packageHolderID,
+                isPublic
+            ));
+
+
+            if(response.body() != null){
+                val body = response.body()!!
+                return Result.Success(body);
+            }
+        }catch (e : HttpException){
+            return when(e.code()) {
+                400 -> Result.Error(DataError.Network.BAD_REQUEST)
+                408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+                413 -> Result.Error(DataError.Network.PAYLOAD_TOO_LARGE)
+                else -> Result.Error(DataError.Network.UNKNOWN)
+            }
+        }
+
+        return Result.Error(DataError.Network.UNKNOWN)
     }
 
 

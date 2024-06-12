@@ -10,6 +10,7 @@ import java.util.UUID
 sealed class Screen(val route: String, val icon: Int, val name: String) {
     data object MainScreen : Screen("main_screen", R.drawable.house_solid, "Home")
     data object PackageHoldersScreen : Screen("package_holders", R.drawable.house_solid, "Package Holders")
+    data object AddPackageHolderScreen : Screen("add_package_holder", R.drawable.house_solid, "Add Package Holder")
     data object SettingsScreen : Screen("settings", R.drawable.gear_solid, "Settings")
     data object PackagesOutListScreen : Screen("packages_out", R.drawable.box_open_solid, "Outgoing packages")
     data object PackagesInListScreen : Screen("packages_in", R.drawable.box_solid, "Incoming packages")

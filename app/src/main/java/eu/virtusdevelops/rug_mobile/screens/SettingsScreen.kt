@@ -47,211 +47,222 @@ fun SettingsScreen(navController: NavController, innerPaddingValues: PaddingValu
     val viewModel = hiltViewModel<UserViewModel>()
 
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = "Settings",
-                        fontWeight = FontWeight.Bold,)
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                navigationIcon =  {
-                    IconButton(onClick = {
-                        navController.navigateUp()
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { padValues ->
-        Column(
+
+    Column(
+        modifier = Modifier
+            .padding(innerPaddingValues)
+            .fillMaxSize()
+    ) {
+
+
+        GradientCard(
             modifier = Modifier
-                .padding(padValues)
-                .fillMaxSize()
+                .fillMaxWidth()
+                .padding(8.dp),
+            onClick = {}
         ) {
 
-
-            GradientCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                onClick = {}
-            ) {
-
-                Column(modifier = Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.padding(8.dp)) {
 
 
-                    Button(
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        // open help menu?
+                    }) {
+                    Text(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = {
-                            // open help menu?
-                        }) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Help",
-                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
+                        text = "Help",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            background = Color.Transparent,
+                            textAlign = TextAlign.Left
                         )
-                    }
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = {
-                            navController.navigate(AuthGraph.ChangePasswordScreen.route){
-                                popUpTo(navController.graph.startDestinationId) { inclusive = false }
-                            }
-                        }) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Change password",
-                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
-                        )
-                    }
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = {
-                            // todo: open sessions menu
-                            navController.navigate(AuthGraph.ActiveSessionScreen.route)
-                        }) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Active sessions",
-                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
-                        )
-                    }
-
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = {
-                            // todo: open sessions menu
-                            navController.navigate(AuthGraph.PendingSessionsScreen.route)
-                        }) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Pending sessions",
-                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
-                        )
-                    }
-
+                    )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-
-            GradientCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                onClick = {}
-            ) {
-
-                Column(modifier = Modifier.padding(8.dp)) {
-
-
-                    Button(
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        navController.navigate(AuthGraph.ChangePasswordScreen.route) {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                        }
+                    }) {
+                    Text(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = {
-                            // todo: open 2fa setup menu
-
-
-
-                        }) {
-                        Icon(
-                            painterResource(id = R.drawable.gear_solid),
-                            modifier = Modifier.size(26.dp),
-                            contentDescription = "Setup 2FA",
-                            tint = MaterialTheme.colorScheme.primary
+                        text = "Change password",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            background = Color.Transparent,
+                            textAlign = TextAlign.Left
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Setup 2FA",
-                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
-                        )
-                    }
-
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = {
-                            // todo: open sessions menu
-                        }) {
-                        Icon(
-                            painterResource(id = R.drawable.question_solid),
-                            modifier = Modifier.size(26.dp),
-                            contentDescription = "About",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "About",
-                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
-                        )
-                    }
-
-
-
-
-                        
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = {
-                            viewModel.logout {
-                                navController.navigate(Graph.AUTHENTICATION) {
-                                    popUpTo(navController.graph.id)
-                                }
-                            }
-                        }) {
-                        Icon(
-                            painterResource(id = R.drawable.right_from_bracket_solid),
-                            modifier = Modifier.size(26.dp),
-                            contentDescription = "Logout icon",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Logout",
-                            style = TextStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, background = Color.Transparent, textAlign = TextAlign.Left)
-                        )
-                    }
-
-
+                    )
                 }
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        // todo: open sessions menu
+                        navController.navigate(AuthGraph.ActiveSessionScreen.route)
+                    }) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Active sessions",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            background = Color.Transparent,
+                            textAlign = TextAlign.Left
+                        )
+                    )
+                }
+
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        // todo: open sessions menu
+                        navController.navigate(AuthGraph.PendingSessionsScreen.route)
+                    }) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Pending sessions",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            background = Color.Transparent,
+                            textAlign = TextAlign.Left
+                        )
+                    )
+                }
+
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+
+        GradientCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            onClick = {}
+        ) {
+
+            Column(modifier = Modifier.padding(8.dp)) {
+
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        // todo: open 2fa setup menu
+
+
+                    }) {
+                    Icon(
+                        painterResource(id = R.drawable.gear_solid),
+                        modifier = Modifier.size(26.dp),
+                        contentDescription = "Setup 2FA",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Setup 2FA",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            background = Color.Transparent,
+                            textAlign = TextAlign.Left
+                        )
+                    )
+                }
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        // todo: open sessions menu
+                    }) {
+                    Icon(
+                        painterResource(id = R.drawable.question_solid),
+                        modifier = Modifier.size(26.dp),
+                        contentDescription = "About",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "About",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            background = Color.Transparent,
+                            textAlign = TextAlign.Left
+                        )
+                    )
+                }
+
+
+
+
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        viewModel.logout {
+                            navController.navigate(Graph.AUTHENTICATION) {
+                                popUpTo(navController.graph.id)
+                            }
+                        }
+                    }) {
+                    Icon(
+                        painterResource(id = R.drawable.right_from_bracket_solid),
+                        modifier = Modifier.size(26.dp),
+                        contentDescription = "Logout icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Logout",
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            background = Color.Transparent,
+                            textAlign = TextAlign.Left
+                        )
+                    )
+                }
+
+
+            }
+        }
+
     }
-
-
-
 
 
 }

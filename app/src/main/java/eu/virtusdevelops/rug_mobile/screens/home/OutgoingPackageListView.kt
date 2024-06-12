@@ -81,64 +81,48 @@ fun OutgoingPackageListView(navController: NavController, innerPaddingValues: Pa
 
 
 
-    Scaffold(
 
-        floatingActionButton = {
-            androidx.compose.material3.FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.SendPackage.route)
-                },
-                modifier = Modifier.padding(innerPaddingValues)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Send")
-            }
-        }
-    ) { padding ->
-        Box(
+    Box(
+        modifier = Modifier
+            .pullRefresh(refreshState)
+            .padding(innerPaddingValues)
+    ) {
+
+
+        Column(
             modifier = Modifier
-                .pullRefresh(refreshState)
-                .padding(innerPaddingValues)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            if (isError) {
+                Text(text = "An error occurred. Please try again.")
+            } else if (!isBusy) {
+                if (deliveryPackages.isEmpty()) {
 
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                if (isError) {
-                    Text(text = "An error occurred. Please try again.")
-                } else if (!isBusy) {
-                    if (deliveryPackages.isEmpty()) {
-
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Text(text = "No packages found.")
-                        }
-
-                    } else {
-                        ListAllOutgoingPackages(packages = deliveryPackages, navController)
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Text(text = "No packages found.")
                     }
+
+                } else {
+                    ListAllOutgoingPackages(packages = deliveryPackages, navController)
                 }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPaddingValues)
-                .pullRefresh(refreshState),
-            contentAlignment = Alignment.TopCenter
-        ) {
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPaddingValues)
+            .pullRefresh(refreshState),
+        contentAlignment = Alignment.TopCenter
+    ) {
 
-            PullRefreshIndicator(
-                refreshing = isBusy,
-                state = refreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-        }
-        Box(
-            modifier = Modifier.padding(padding)
+        PullRefreshIndicator(
+            refreshing = isBusy,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 

@@ -53,50 +53,5 @@ class OutgoingPackageListViewModel @Inject constructor(
         }
     }
 
-    fun addOutgoingPackage(
-        email: String,
-        firstName: String,
-        lastName: String,
-        packageHolder: String,
-        streetAddress: String,
-        houseNumber: String,
-        postNumber: String,
-        city: String,
-        country: String,
-        onSuccess: () -> Unit
-    ) {
-
-        viewModelScope.launch {
-            isBusy = true
-            isError = false
-
-            when (val result = repository.addOutgoingPackage(
-                AddOutgoingPackageRequest(
-                    email,
-                    firstName,
-                    lastName,
-                    UUID.fromString(packageHolder),
-                    streetAddress,
-                    houseNumber,
-                    city,
-                    postNumber,
-                    country,
-                    tokenFormat = 2,
-                )
-            )) {
-                is Result.Error -> {
-                    isError = true
-                    Log.d("ERROR", result.error.toString())
-                }
-
-                is Result.Success -> {
-                    onSuccess()
-                }
-            }
-
-            isBusy = false
-            isLoaded = true
-        }
-    }
 
 }

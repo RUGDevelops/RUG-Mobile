@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -29,9 +30,11 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -91,10 +94,12 @@ fun PackageHoldersScreen(
         onRefresh = { packageHolderViewModel.load() }
     )
 
+
     Box(
-        modifier = Modifier.pullRefresh(refreshState)
+        modifier = Modifier
+            .pullRefresh(refreshState)
             .padding(innerPaddingValues)
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -106,9 +111,9 @@ fun PackageHoldersScreen(
             } else if (isError) {
                 Text(text = "An error occurred. Please try again.")
             } else {
-                if(packageHolders.isEmpty()){
+                if (packageHolders.isEmpty()) {
                     Text(text = "No package holders found.")
-                }else{
+                } else {
                     ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
                 }
             }
@@ -118,7 +123,8 @@ fun PackageHoldersScreen(
         modifier = Modifier
             .fillMaxWidth()
             .pullRefresh(refreshState),
-        contentAlignment = Alignment.TopCenter){
+        contentAlignment = Alignment.TopCenter
+    ) {
 
         PullRefreshIndicator(
             refreshing = isBusy,
@@ -126,6 +132,7 @@ fun PackageHoldersScreen(
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
+
 
 }
 

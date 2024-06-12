@@ -2,12 +2,29 @@ package eu.virtusdevelops.rug_mobile.screens
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,10 +40,16 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,6 +59,8 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import eu.virtusdevelops.rug_mobile.R
+import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.navigation.SetupNavGraph
@@ -75,6 +100,9 @@ fun MainScreen(
         topBar = {
             TopNavBar(navController, viewModel)
         },
+        floatingActionButton = {
+            FloatingBar(navController = navController)
+        },
 //        floatingActionButton = {
 //            FloatingActionButton(onClick = { presses++ }) {
 //                Icon(Icons.Default.Add, contentDescription = "Send")
@@ -91,7 +119,46 @@ fun MainScreen(
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FloatingBar(navController: NavController){
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    if(currentDestination?.route == Screen.PackagesOutListScreen.route){
+        androidx.compose.material3.FloatingActionButton(
+            onClick = {
+                navController.navigate(Screen.SendPackage.route)
+            },
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Send")
+        }
+    }else if(currentDestination?.route == Screen.PackageHoldersScreen.route){
+        androidx.compose.material3.FloatingActionButton(
+            onClick = {
+                navController.navigate(Screen.AddPackageHolderScreen.route)
+            },
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add")
+        }
+    }else if(currentDestination?.route == Screen.PackagesInListScreen.route){
+        androidx.compose.material3.FloatingActionButton(
+            onClick = {
+                navController.navigate(Screen.AddPackageHolderScreen.route)
+            },
+        ) {
+            Icon(
+                painterResource(id = R.drawable.qrcode_solid),
+                modifier = Modifier
+                    .width(32.dp)
+                    .height(32.dp),
+                contentDescription = "Claim")
+        }
+    }
+
+}
+
+
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
@@ -103,7 +170,9 @@ fun BottomBar(navController: NavHostController) {
     val currentDestination = navBackStackEntry?.destination
 
     val bottomBarDestination = screens.any { it.route == currentDestination?.route }
-    if (bottomBarDestination) {
+
+
+    if(bottomBarDestination){
         NavigationBar {
             screens.forEach { screen ->
                 AddItem(
@@ -114,7 +183,30 @@ fun BottomBar(navController: NavHostController) {
             }
         }
     }
+
+//    AnimatedVisibility(
+//        visible = bottomBarDestination,
+//        enter = slideInVertically(),
+//        exit = slideOutVertically()
+//    ) {
+//        NavigationBar {
+//            screens.forEach { screen ->
+//                AddItem(
+//                    screen = screen,
+//                    currentDestination = currentDestination,
+//                    navController = navController
+//                )
+//            }
+//        }
+//
+//    }
+
+
 }
+
+
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -123,45 +215,49 @@ fun TopNavBar(navController: NavHostController, viewModel: UserViewModel){
     val screens = listOf(
         Screen.PackageHoldersScreen,
         Screen.PackagesOutListScreen,
-        Screen.PackagesInListScreen
+        Screen.PackagesInListScreen,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     val bottomBarDestination = screens.any { it.route == currentDestination?.route }
 
-
-    if (bottomBarDestination) {
-        TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ),
-            title = {
-                    Text(screens.find { it.route == currentDestination?.route }?.name ?: "Unknown")
-            },
-            actions = {
-                IconButton(onClick = {
-
-
-                    navController.navigate(Screen.SettingsScreen.route)
-
-//                    viewModel.logout(onSuccess = {
-//                        navController.navigate(Graph.AUTHENTICATION) {
-//                            popUpTo(navController.graph.id)
-//                        }
-//                    })
-//                        if (!viewModel.isLoggedIn) {
-//                            navController.navigate(Screen.LoginScreen.route) {
-//                                popUpTo(navController.graph.id)
-//                            }
-//                        }
-                }) {
-                    Icon(Icons.Default.Settings, contentDescription = "Settings")
-                }
-            }
-        )
+    if(currentDestination?.route == Screen.SendPackage.route){
+        CustomTopbar("Send package", navController)
+    }else if(currentDestination?.route == Screen.AddPackageHolderScreen.route){
+        CustomTopbar("Add Package Holder", navController)
+    }else if(currentDestination?.route == Screen.SettingsScreen.route){
+        CustomTopbar("Settings", navController)
+    }else if(currentDestination?.route == Screen.PackageHolderScreen.route){
+        CustomTopbar("History", navController)
+    }else if(currentDestination?.route == AuthGraph.PendingSessionsScreen.route){
+        CustomTopbar("Pending sessions", navController)
+    }else if(currentDestination?.route == AuthGraph.ActiveSessionScreen.route){
+        CustomTopbar("Active sessions", navController)
     }
+    else {
+        if (bottomBarDestination) {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                    Text(screens.find { it.route == currentDestination?.route }?.name ?: "Unknown")
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(Screen.SettingsScreen.route)
+                    }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                }
+            )
+        }
+    }
+
+
+
 }
 
 
@@ -189,6 +285,28 @@ fun RowScope.AddItem(
     })
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTopbar(title: String, navController: NavController){
+    TopAppBar(
+        title = {
+            Text(text = title,
+                fontWeight = FontWeight.Bold,)
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        navigationIcon =  {
+            IconButton(onClick = {
+                navController.navigateUp()
+            }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
+        }
+    )
+}
 
 
 

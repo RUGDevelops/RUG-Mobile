@@ -35,6 +35,7 @@ class UserViewModel @Inject constructor(
     var isLoggedIn by mutableStateOf(false)
     var isBusy by mutableStateOf(true)
     var user: User? by mutableStateOf(null)
+    var deviceToken: String by mutableStateOf("")
     var error: String? by mutableStateOf(null)
 
     private val LOGGED_IN = booleanPreferencesKey("is_logged_in")
@@ -43,12 +44,14 @@ class UserViewModel @Inject constructor(
     private val LASTNAME_KEY = stringPreferencesKey("user_last_name")
     private val COOKIE_PATH = stringPreferencesKey("user_cookie")
     private val VERIFIED_PATH = booleanPreferencesKey("is_verified")
+    private val DEVICE_TOKEN = stringPreferencesKey("device_token")
 
     init {
         isBusy = true
         viewModelScope.launch {
             //saveUserPreferences(false, "", "", "", "", false)
             loadUser()
+            loadDeviceToken()
 
             // validate login state on backend?
             val result = authRepository.validateLoginState()
@@ -82,7 +85,7 @@ class UserViewModel @Inject constructor(
                 lastName,
                 password,
                 repeatPassword,
-                "TODO_DEVICE_TOKEN"
+                deviceToken
             );
             when(result){
                 is Result.Error -> {
@@ -187,7 +190,7 @@ class UserViewModel @Inject constructor(
             val result = authRepository.login(
                 email,
                 password,
-                "TODO_DEVICE_TOKEN"
+                deviceToken
             )
 
             when(result){
@@ -273,6 +276,21 @@ class UserViewModel @Inject constructor(
                 apiObject.setCookie(preferences.cookie)
             }
         } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+    }
+
+
+    private suspend fun loadDeviceToken(){
+        try{
+            val preferences = application.dataStore.data
+                .map { preferences ->
+                    preferences[DEVICE_TOKEN]
+                }.firstOrNull()
+            if (preferences != null) {
+                deviceToken = preferences
+            }
+        }catch (ex: Exception) {
             ex.printStackTrace()
         }
     }
