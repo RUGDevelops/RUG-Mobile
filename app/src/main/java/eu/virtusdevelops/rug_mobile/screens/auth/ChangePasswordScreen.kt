@@ -54,7 +54,7 @@ fun ChangePasswordScreen(
     var newPasswordVisibility by remember { mutableStateOf(false) }
 
     var isError by remember { mutableStateOf(false) }
-    var passwordError by remember { mutableStateOf(PasswordValidationState()) }
+    var passwordError by remember { mutableStateOf(PasswordValidationState()) } 
 
     isError = oldPassword.isEmpty() && newPassword.isEmpty() && confirmPassword.isEmpty()
 

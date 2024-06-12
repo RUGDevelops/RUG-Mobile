@@ -1,5 +1,6 @@
 package eu.virtusdevelops.rug_mobile.services
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -37,9 +38,13 @@ class PushNotificationService: FirebaseMessagingService() {
     @Inject
     lateinit var apiRequest: ApiRequest
 
+
+
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
+        Log.i("FIREBASE", "Yo new token for device has been given: $token")
 
 
 
