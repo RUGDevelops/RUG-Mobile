@@ -78,30 +78,16 @@ fun ActiveSessionsList(navController: NavController, innerPaddingValues: Padding
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
-            Text(
-                text = "Active sessions",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
             if (isError) {
                 Text(text = "An error occurred. Please try again.")
             } else if(!isBusy){
                 if(sessions.isEmpty()){
                     Text(text = "No sessions found")
                 }else{
-
-
-
                     ListAllActiveSessions(sessions = sessions, viewModel)
                 }
             }
         }
-        
-
     }
 
     Box(

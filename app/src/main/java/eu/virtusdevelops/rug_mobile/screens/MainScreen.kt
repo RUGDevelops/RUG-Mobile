@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,6 +38,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.navigation.SetupNavGraph
@@ -123,45 +126,45 @@ fun TopNavBar(navController: NavHostController, viewModel: UserViewModel){
     val screens = listOf(
         Screen.PackageHoldersScreen,
         Screen.PackagesOutListScreen,
-        Screen.PackagesInListScreen
+        Screen.PackagesInListScreen,
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     val bottomBarDestination = screens.any { it.route == currentDestination?.route }
 
-
-    if (bottomBarDestination) {
-        TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.primary,
-            ),
-            title = {
-                    Text(screens.find { it.route == currentDestination?.route }?.name ?: "Unknown")
-            },
-            actions = {
-                IconButton(onClick = {
-
-
-                    navController.navigate(Screen.SettingsScreen.route)
-
-//                    viewModel.logout(onSuccess = {
-//                        navController.navigate(Graph.AUTHENTICATION) {
-//                            popUpTo(navController.graph.id)
-//                        }
-//                    })
-//                        if (!viewModel.isLoggedIn) {
-//                            navController.navigate(Screen.LoginScreen.route) {
-//                                popUpTo(navController.graph.id)
-//                            }
-//                        }
-                }) {
-                    Icon(Icons.Default.Settings, contentDescription = "Settings")
-                }
-            }
-        )
+    if(currentDestination?.route == Screen.SendPackage.route){
+        CustomTopbar("Send package", navController)
+    }else if(currentDestination?.route == Screen.SettingsScreen.route){
+        CustomTopbar("Settings", navController)
+    }else if(currentDestination?.route == AuthGraph.PendingSessionsScreen.route){
+        CustomTopbar("Pending sessions", navController)
+    }else if(currentDestination?.route == AuthGraph.ActiveSessionScreen.route){
+        CustomTopbar("Active sessions", navController)
     }
+    else {
+        if (bottomBarDestination) {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                    Text(screens.find { it.route == currentDestination?.route }?.name ?: "Unknown")
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(Screen.SettingsScreen.route)
+                    }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                }
+            )
+        }
+    }
+
+
+
 }
 
 
@@ -189,6 +192,28 @@ fun RowScope.AddItem(
     })
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTopbar(title: String, navController: NavController){
+    TopAppBar(
+        title = {
+            Text(text = title,
+                fontWeight = FontWeight.Bold,)
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        navigationIcon =  {
+            IconButton(onClick = {
+                navController.navigateUp()
+            }) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
+        }
+    )
+}
 
 
 

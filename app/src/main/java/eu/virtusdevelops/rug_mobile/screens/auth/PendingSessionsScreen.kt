@@ -44,7 +44,7 @@ import eu.virtusdevelops.rug_mobile.viewModels.PendingSessionsViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun PendingSessionsList(navController: NavController, innerPaddingValues: PaddingValues){
+fun PendingSessionsList(navController: NavController, innerPaddingValues: PaddingValues) {
 
 
     val viewModel = hiltViewModel<PendingSessionsViewModel>()
@@ -55,10 +55,9 @@ fun PendingSessionsList(navController: NavController, innerPaddingValues: Paddin
 
 
     LaunchedEffect(Unit) {
-        if(!viewModel.isLoaded)
+        if (!viewModel.isLoaded)
             viewModel.load()
     }
-
 
 
     val refreshState = rememberPullRefreshState(
@@ -72,36 +71,24 @@ fun PendingSessionsList(navController: NavController, innerPaddingValues: Paddin
             .pullRefresh(refreshState)
             .fillMaxHeight()
             .padding(innerPaddingValues)
-    ){
+    ) {
 
         Column(
             modifier = Modifier
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
-            Text(
-                text = "Pending sessions",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
             if (isError) {
                 Text(text = "An error occurred. Please try again.")
-            } else if(!isBusy){
-                if(sessions.isEmpty()){
+            } else if (!isBusy) {
+                if (sessions.isEmpty()) {
                     Text(text = "No sessions found")
-                }else{
-
-
-
+                } else {
                     ListAllPendingSessions(sessions = sessions, viewModel)
                 }
             }
         }
-        
+
 
     }
 
@@ -109,7 +96,8 @@ fun PendingSessionsList(navController: NavController, innerPaddingValues: Paddin
         modifier = Modifier
             .fillMaxWidth()
             .pullRefresh(refreshState),
-        contentAlignment = Alignment.TopCenter){
+        contentAlignment = Alignment.TopCenter
+    ) {
 
         PullRefreshIndicator(
             refreshing = isBusy,
@@ -121,8 +109,10 @@ fun PendingSessionsList(navController: NavController, innerPaddingValues: Paddin
 }
 
 @Composable
-fun ListAllPendingSessions(sessions: List<SessionInformation>, viewModel: PendingSessionsViewModel){
-
+fun ListAllPendingSessions(
+    sessions: List<SessionInformation>,
+    viewModel: PendingSessionsViewModel
+) {
 
 
     GradientCard(
@@ -130,7 +120,7 @@ fun ListAllPendingSessions(sessions: List<SessionInformation>, viewModel: Pendin
         onClick = {}) {
         LazyColumn {
             sessions.forEach {
-                item{
+                item {
                     PendingSessionCard(session = it, viewModel)
                     HorizontalDivider(thickness = 0.5.dp)
                 }
@@ -140,7 +130,6 @@ fun ListAllPendingSessions(sessions: List<SessionInformation>, viewModel: Pendin
 
 
 }
-
 
 
 @Composable
