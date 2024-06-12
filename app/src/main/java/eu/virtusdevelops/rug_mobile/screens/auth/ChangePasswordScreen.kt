@@ -1,5 +1,6 @@
 package eu.virtusdevelops.rug_mobile.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -65,7 +66,7 @@ fun ChangePasswordScreen(
         .padding(5.dp)
         .fillMaxWidth()
 
-    /// var viewModel = hiltViewModel<UserViewModel>()
+    var viewModel = hiltViewModel<UserViewModel>()
 
     GradientBackground {
         Column (
@@ -157,9 +158,14 @@ fun ChangePasswordScreen(
 
             Button(
                 onClick = {
-//                    viewModel.changePassword(oldPassword, newPassword, confirmPassword) {
-//                        navController.navigate(Graph.AuthGraph.LoginScreen.route)
-//                    }
+                    viewModel.changePassword(oldPassword, newPassword, confirmPassword) {
+                        navController.popBackStack()
+                        Toast.makeText(
+                            navController.context,
+                            "Password changed successfully",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -170,10 +176,15 @@ fun ChangePasswordScreen(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(
-                    text = "Change password",
-                    fontWeight = FontWeight.Bold
-                )
+                if (viewModel.isBusy) {
+                    CircularProgressIndicator()
+                } else
+                {
+                    Text(
+                        text = "Change password",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
         }

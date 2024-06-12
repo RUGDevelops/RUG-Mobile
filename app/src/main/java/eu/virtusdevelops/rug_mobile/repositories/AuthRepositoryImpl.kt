@@ -95,6 +95,14 @@ class AuthRepositoryImpl @Inject constructor(
         return Result.Error(DataError.Network.UNKNOWN)
     }
 
+    override suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+        repeatPassword: String
+    ): Result<Boolean, DataError.Network> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun imageLogin(
         email: String,
         image: ByteArray

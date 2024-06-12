@@ -1,6 +1,8 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.rug_mobile.domain.Result
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,6 +52,31 @@ class OutgoingPackageListViewModel @Inject constructor(
             isBusy = false
             isLoaded = true
 
+        }
+    }
+
+    fun addOutgoingPackage(
+        email: String,
+        firstName: String,
+        lastName: String,
+        packageHolder: String,
+        streetAddress: String,
+        houseNumber: String,
+        postNumber: String,
+        city: String,
+        country: String,
+        onSuccess: () -> Unit
+    ){
+
+        viewModelScope.launch {
+            isBusy = true
+            isError = false
+
+            delay(1000L)
+            onSuccess()
+
+            isBusy = false
+            isLoaded = true
         }
     }
 

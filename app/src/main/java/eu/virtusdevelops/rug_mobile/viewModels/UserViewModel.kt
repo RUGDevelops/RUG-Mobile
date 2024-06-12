@@ -97,6 +97,29 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    fun changePassword(oldPassword: String, newPassword: String, repeatPassword: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            isBusy = true
+            error = null
+
+            val result = authRepository.changePassword(
+                oldPassword,
+                newPassword,
+                repeatPassword
+            )
+
+            when(result){
+                is Result.Error -> {
+                    error = result.error.name
+                }
+                is Result.Success -> {
+                    onSuccess()
+                }
+            }
+            isBusy = false
+        }
+    }
+
     fun loginWithImage(email: String, image: Bitmap){
         isBusy = true
         viewModelScope.launch(Dispatchers.IO) {
