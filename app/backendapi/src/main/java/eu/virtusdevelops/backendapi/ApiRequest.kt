@@ -1,11 +1,12 @@
 package eu.virtusdevelops.backendapi
+import eu.virtusdevelops.backendapi.requests.AddOutgoingPackageRequest
 import eu.virtusdevelops.backendapi.requests.AddPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.ChangeDeviceTokenRequest
 import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
-import eu.virtusdevelops.backendapi.responses.LoginData
 import eu.virtusdevelops.backendapi.responses.LoginResponse
+import eu.virtusdevelops.backendapi.responses.OutgoingPackageResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
 import eu.virtusdevelops.backendapi.responses.PackageVerifyResponse
@@ -94,6 +95,9 @@ interface ApiRequest {
     @GET("package/outgoing")
     suspend fun getAllOutgoingPackages(): Response<List<DeliveryPackage>>
 
+    @Headers("Content-Type: application/json")
+    @POST("package/sendPackage")
+    suspend fun sendPackage(@Body outgoingPackageData: AddOutgoingPackageRequest): Response<OutgoingPackageResponse>
 
     /**
      * Call this to open package holder to deposit package

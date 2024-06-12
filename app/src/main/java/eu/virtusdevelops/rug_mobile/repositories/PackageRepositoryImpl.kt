@@ -1,7 +1,10 @@
 package eu.virtusdevelops.rug_mobile.repositories
 
+import android.util.Log
 import eu.virtusdevelops.backendapi.ApiRequest
+import eu.virtusdevelops.backendapi.requests.AddOutgoingPackageRequest
 import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
+import eu.virtusdevelops.backendapi.requests.PackageData
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.rug_mobile.domain.DataError
 import eu.virtusdevelops.rug_mobile.domain.Result
@@ -77,6 +80,26 @@ class PackageRepositoryImpl @Inject constructor(
             }
         }
 
+        return Result.Error(DataError.Network.UNKNOWN)
+    }
+
+    override suspend fun addOutgoingPackage(packageRequest: AddOutgoingPackageRequest): Result<PackageData, DataError.Network> {
+        try {
+            Log.d("REQUEST", packageRequest.toString())
+            val response = api.sendPackage(packageRequest)
+            if(response.body() != null){
+                 val body = response.body()!!
+                 Log.d("RESPONSE", body.toString())
+                 return Result.Success(body.packageData)
+             }
+        } catch(e: HttpException) {
+            return when(e.code()) {
+                400 -> Result.Error(DataError.Network.BAD_REQUEST)
+                408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+                413 -> Result.Error(DataError.Network.PAYLOAD_TOO_LARGE)
+                else -> Result.Error(DataError.Network.UNKNOWN)
+            }
+        }
         return Result.Error(DataError.Network.UNKNOWN)
     }
 

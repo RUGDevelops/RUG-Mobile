@@ -62,8 +62,10 @@ fun RegisterScreen(
 
     var passwordVisibility by remember { mutableStateOf(false) }
     val viewModel = hiltViewModel<UserViewModel>()
+
     var passwordError by remember { mutableStateOf(PasswordValidationState()) }
     var fieldsError by remember { mutableStateOf(false) }
+    var apiError by remember { mutableStateOf(false) }
 
     val modifier = Modifier
         .padding(5.dp)
@@ -76,6 +78,7 @@ fun RegisterScreen(
     }
 
     fieldsError = email.isEmpty() && firstName.isEmpty() && lastName.isEmpty() && password.isEmpty() && repeatPassword.isEmpty()
+    apiError = viewModel.error != null
 
     Column(
         modifier = Modifier
@@ -162,6 +165,13 @@ fun RegisterScreen(
                     color = MaterialTheme.colorScheme.error
                 )
             }
+
+            if (apiError) {
+                Text(
+                    viewModel.error ?: "An error occurred",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
 
         Column(
@@ -187,7 +197,7 @@ fun RegisterScreen(
                         Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
                     })
                 },
-                //enabled = passwordError.successful && !fieldsError,
+                enabled = passwordError.successful && !fieldsError,
                 modifier = modifier
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(

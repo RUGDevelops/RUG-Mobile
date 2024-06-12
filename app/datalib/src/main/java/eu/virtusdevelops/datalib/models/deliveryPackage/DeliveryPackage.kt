@@ -22,9 +22,9 @@ data class DeliveryPackage(
     val city: String,
     val postNumber: String,
     val country: String,
+    val statusUpdateList: List<DeliveryPackageStatusUpdate>,
     val courier: User?,
     val sender: User,
     val pickupPackageHolder: PackageHolder,
     val deliveryPackageHolder: PackageHolder?,
-    val statusUpdateList: List<DeliveryPackageStatusUpdate>
 )

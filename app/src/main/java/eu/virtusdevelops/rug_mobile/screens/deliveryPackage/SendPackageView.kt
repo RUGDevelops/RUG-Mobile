@@ -1,5 +1,8 @@
 package eu.virtusdevelops.rug_mobile.screens.deliveryPackage
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,22 +10,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsEndWidth
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.TabRowDefaults.Divider
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -31,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,56 +35,53 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.R
-import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
-import eu.virtusdevelops.rug_mobile.navigation.Graph
-import eu.virtusdevelops.rug_mobile.navigation.Screen
-import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
 import eu.virtusdevelops.rug_mobile.viewModels.OutgoingPackageListViewModel
-import eu.virtusdevelops.rug_mobile.viewModels.PackageViewModel
-import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
+import io.github.g00fy2.quickie.QRResult
+import io.github.g00fy2.quickie.ScanQRCode
 
 @Composable
 fun SendPackageView(
     navController: NavController,
     paddingValues: PaddingValues
 ) {
-    var email by remember { mutableStateOf("") }
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var packageHolder by remember { mutableStateOf("") }
-    var streetAddress by remember { mutableStateOf("") }
-    var houseNumber by remember { mutableStateOf("") }
-    var postNumber by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var country by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("rene.jausovec1@student.um.si") }
+    var firstName by remember { mutableStateOf("Rene") }
+    var lastName by remember { mutableStateOf("Jausovec") }
+    var packageHolder by remember { mutableStateOf("e9a13c34-ce75-4319-b0ed-bc5d91b28074") }
+    var streetAddress by remember { mutableStateOf("Random") }
+    var houseNumber by remember { mutableStateOf("30") }
+    var postNumber by remember { mutableStateOf("2000") }
+    var city by remember { mutableStateOf("Maribor") }
+    var country by remember { mutableStateOf("Slovenia") }
+
+    var packageHolderId by remember { mutableIntStateOf(0) }
 
     val modifier = Modifier
         .padding(2.dp)
         .fillMaxWidth()
 
-    // var viewModel = hiltViewModel<OutgoingPackageListViewModel>()
+    val scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
+        result.let {
+            var qrData = result.toString()
+            if(result is QRResult.QRUserCanceled) return@let
+
+            Log.d("RESULT_DATA", qrData)
+            packageHolderId = parseQrResult(qrData) ?: 0
+        }
+    }
+
+    var viewModel = hiltViewModel<OutgoingPackageListViewModel>()
 
     Column(
         modifier = Modifier
@@ -153,7 +144,7 @@ fun SendPackageView(
                 ) {
                     IconButton(
                         onClick = {
-
+                            scanQRCodeLauncher.launch(null)
                         },
                         modifier = modifier
                             // .align(Alignment.CenterVertically)
@@ -229,24 +220,24 @@ fun SendPackageView(
             Button(
                 shape = RoundedCornerShape(10.dp),
                 onClick = {
-//                     viewModel.addOutgoingPackage(
-//                        email,
-//                        firstName,
-//                        lastName,
-//                        packageHolder,
-//                        streetAddress,
-//                        houseNumber,
-//                        postNumber,
-//                        city,
-//                        country
-//                    ) {
-//                        Toast.makeText(
-//                            navController.context,
-//                            "Created package successfully!",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                        navController.popBackStack()
-//                    }
+                     viewModel.addOutgoingPackage(
+                        email,
+                        firstName,
+                        lastName,
+                        packageHolder,
+                        streetAddress,
+                        houseNumber,
+                        postNumber,
+                        city,
+                        country
+                    ) {
+                        Toast.makeText(
+                            navController.context,
+                            "Created package successfully!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        navController.popBackStack()
+                    }
                 },
                 modifier = modifier
                     .height(50.dp),
@@ -255,7 +246,7 @@ fun SendPackageView(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                if (false /*viewModel.isBusy*/) {
+                if (viewModel.isBusy) {
                     CircularProgressIndicator()
                 } else {
                     Text(
@@ -283,6 +274,30 @@ fun SendPackageView(
             }
         }
     }
+}
+
+fun parseQrResult(qrData: String) : Int? {
+    if(qrData.isEmpty()) return null
+    val rawValueStartIndex = qrData.indexOf("rawValue=") + "rawValue=".length
+    val rawValueEndIndex = qrData.indexOf(")", startIndex = rawValueStartIndex)
+    val rawValue = qrData.substring(rawValueStartIndex, rawValueEndIndex)
+
+    val components = rawValue.split(",")
+
+    if (components.size == 3) {
+        val url = components[0]
+        val urlComponents = url.split("/")
+
+        if (urlComponents.size >= 11) {
+            val packageHolderId = urlComponents[4].toIntOrNull() ?: 0
+            return packageHolderId
+        } else {
+            Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
+        }
+    } else {
+        Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
+    }
+    return null
 }
 
 @Preview

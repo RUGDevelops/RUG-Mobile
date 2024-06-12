@@ -1,8 +1,6 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
-import android.app.Application
-import android.os.Handler
-import android.os.Looper
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,18 +9,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import eu.virtusdevelops.backendapi.requests.AddOutgoingPackageRequest
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.rug_mobile.domain.Result
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 
 @HiltViewModel
 class OutgoingPackageListViewModel @Inject constructor(
     private val repository: PackageRepository
-): ViewModel(){
+) : ViewModel() {
 
     var isBusy by mutableStateOf(false)
     var isError by mutableStateOf(false)
@@ -32,18 +31,17 @@ class OutgoingPackageListViewModel @Inject constructor(
     val deliveryPackages: LiveData<List<DeliveryPackage>> get() = _deliveryPackages
 
 
-
-
-    fun load(){
+    fun load() {
         viewModelScope.launch {
             isBusy = true
             isError = false
             isLoaded = false
 
-            when(val result = repository.getOutgoingPackages()){
+            when (val result = repository.getOutgoingPackages()) {
                 is Result.Error -> {
                     isError = true
                 }
+
                 is Result.Success -> {
                     _deliveryPackages.value = result.data
                 }
@@ -66,14 +64,35 @@ class OutgoingPackageListViewModel @Inject constructor(
         city: String,
         country: String,
         onSuccess: () -> Unit
-    ){
+    ) {
 
         viewModelScope.launch {
             isBusy = true
             isError = false
 
-            delay(1000L)
-            onSuccess()
+            when (val result = repository.addOutgoingPackage(
+                AddOutgoingPackageRequest(
+                    email,
+                    firstName,
+                    lastName,
+                    UUID.fromString(packageHolder),
+                    streetAddress,
+                    houseNumber,
+                    city,
+                    postNumber,
+                    country,
+                    tokenFormat = 2,
+                )
+            )) {
+                is Result.Error -> {
+                    isError = true
+                    Log.d("ERROR", result.error.toString())
+                }
+
+                is Result.Success -> {
+                    onSuccess()
+                }
+            }
 
             isBusy = false
             isLoaded = true

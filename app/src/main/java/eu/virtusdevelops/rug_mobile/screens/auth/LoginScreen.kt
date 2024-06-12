@@ -122,6 +122,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Button(
+                    enabled = !isError,
                     shape = RoundedCornerShape(10.dp),
                     onClick = {
                         viewModel.login(username, password)
