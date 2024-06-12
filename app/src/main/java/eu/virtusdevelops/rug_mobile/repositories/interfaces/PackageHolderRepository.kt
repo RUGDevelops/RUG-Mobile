@@ -1,7 +1,6 @@
 package eu.virtusdevelops.rug_mobile.repositories.interfaces
 
 import eu.virtusdevelops.datalib.models.PackageHolder
-import eu.virtusdevelops.datalib.models.User
 import eu.virtusdevelops.rug_mobile.domain.DataError
 import eu.virtusdevelops.rug_mobile.domain.Result
 

@@ -1,9 +1,5 @@
 package eu.virtusdevelops.rug_mobile.navigation
 
-import android.graphics.drawable.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.ui.graphics.vector.ImageVector
 import eu.virtusdevelops.rug_mobile.R
 import java.util.UUID
 

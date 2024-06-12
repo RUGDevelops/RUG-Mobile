@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,12 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
-import androidx.compose.runtime.LaunchedEffect
 import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.passwordValidation.PasswordValidationState
 import eu.virtusdevelops.rug_mobile.passwordValidation.PasswordValidator
-import eu.virtusdevelops.rug_mobile.navigation.Screen
+import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
 
 @Composable
 fun RegisterScreen(

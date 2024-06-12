@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -55,14 +54,10 @@ import androidx.navigation.NavController
 import eu.virtusdevelops.datalib.models.User
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackageStatus
-import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackageStatusUpdate
 import eu.virtusdevelops.datalib.models.deliveryPackage.Recipient
 import eu.virtusdevelops.rug_mobile.R
-import eu.virtusdevelops.rug_mobile.navigation.Graph
 import eu.virtusdevelops.rug_mobile.screens.GradientCard
-import eu.virtusdevelops.rug_mobile.screens.home.ProgressBar
 import eu.virtusdevelops.rug_mobile.screens.home.baseStatusList
-import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderViewModel
 import eu.virtusdevelops.rug_mobile.viewModels.PackageViewModel
 import java.io.File
 import java.io.FileOutputStream

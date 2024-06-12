@@ -1,4 +1,5 @@
 package eu.virtusdevelops.backendapi
+
 import eu.virtusdevelops.backendapi.requests.AddOutgoingPackageRequest
 import eu.virtusdevelops.backendapi.requests.AddPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.ChangeDeviceTokenRequest
@@ -12,14 +13,13 @@ import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
 import eu.virtusdevelops.backendapi.responses.PackagePickupResponse
 import eu.virtusdevelops.backendapi.responses.PackageVerifyResponse
-import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.SessionInformation
 import eu.virtusdevelops.datalib.models.User
+import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
-
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET

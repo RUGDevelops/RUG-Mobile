@@ -1,7 +1,6 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,7 +11,6 @@ import eu.virtusdevelops.backendapi.requests.AddOutgoingPackageRequest
 import eu.virtusdevelops.rug_mobile.domain.Result
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageHolderRepository
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
-import eu.virtusdevelops.rug_mobile.repositories.interfaces.SessionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow

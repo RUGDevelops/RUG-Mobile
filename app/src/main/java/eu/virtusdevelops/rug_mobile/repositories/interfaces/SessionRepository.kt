@@ -1,6 +1,5 @@
 package eu.virtusdevelops.rug_mobile.repositories.interfaces
 
-import eu.virtusdevelops.backendapi.responses.LoginData
 import eu.virtusdevelops.datalib.models.SessionInformation
 import eu.virtusdevelops.rug_mobile.domain.DataError
 import eu.virtusdevelops.rug_mobile.domain.Result
