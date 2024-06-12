@@ -18,7 +18,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+<<<<<<< HEAD
 import androidx.compose.foundation.text.KeyboardOptions
+=======
+import androidx.compose.material.TabRowDefaults.Divider
+>>>>>>> 245d7e6 (QrButton refactor)
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +57,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.R
+import eu.virtusdevelops.rug_mobile.modifiers.QrCodeButton
 import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.viewModels.OutgoingPackageListViewModel
 import eu.virtusdevelops.rug_mobile.viewModels.SendPackageViewModel
@@ -83,15 +88,6 @@ fun SendPackageView(
     val modifier = Modifier
         .padding(2.dp)
         .fillMaxWidth()
-
-    val scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
-        result.let {
-            val qrData = result.toString()
-            if (result is QRResult.QRUserCanceled) return@let
-            Log.d("RESULT_DATA", qrData)
-            packageHolder = (parseQrResult(qrData) ?: 0).toString()
-        }
-    }
 
     val context = LocalContext.current
 
@@ -169,37 +165,11 @@ fun SendPackageView(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
-                    Box(
-                        modifier = Modifier
-                            .weight(0.2f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        IconButton(
-                            onClick = {
-                                scanQRCodeLauncher.launch(null)
-                            },
-                            modifier = modifier
-                                // .align(Alignment.CenterVertically)
-                                .fillMaxHeight()
-                                //.weight(0.2f)
-                                .background(
-                                    TextFieldDefaults.colors().unfocusedContainerColor,
-                                    RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-                                ),
-                            content = {
-                                Icon(
-                                    modifier = Modifier.padding(10.dp),
-                                    imageVector = ImageVector.vectorResource(R.drawable.qrcode_solid),
-                                    contentDescription = "qr code scanner"
-                                )
-                            },
-                        )
-                        HorizontalDivider(
-                            color = Color.Black,
-                            thickness = 1.dp,
-                            modifier = modifier
-                                .align(Alignment.BottomCenter)
-                        )
+                    QrCodeButton(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.2f)
+                        .align(Alignment.CenterVertically)) {
+                        packageHolder = it.toString()
                     }
                 }
 
@@ -302,29 +272,4 @@ fun SendPackageView(
             }
         }
     }
-}
-
-fun parseQrResult(qrData: String): Int? {
-    if (qrData.isEmpty()) return null
-    val rawValueStartIndex = qrData.indexOf("rawValue=") + "rawValue=".length
-    val rawValueEndIndex = qrData.indexOf(")", startIndex = rawValueStartIndex)
-    val rawValue = qrData.substring(rawValueStartIndex, rawValueEndIndex)
-
-    val components = rawValue.split(",")
-
-    if (components.size == 3) {
-        val url = components[0]
-        val urlComponents = url.split("/")
-        Log.d("QR_INFO", "URL: $url")
-        if (urlComponents.size >= 11) {
-            val packageHolderId = urlComponents[4].toIntOrNull() ?: 0
-            Log.d("QR_INFO", "ID: $packageHolderId")
-            return packageHolderId
-        } else {
-            Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
-        }
-    } else {
-        Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
-    }
-    return null
 }

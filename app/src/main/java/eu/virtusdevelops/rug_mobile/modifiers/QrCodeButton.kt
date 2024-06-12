@@ -8,58 +8,51 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import eu.virtusdevelops.rug_mobile.R
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
-import kotlin.reflect.KProperty
 
 @Composable
-fun QrCodeButton() {
-    var packageHolderId by remember { mutableIntStateOf(0) }
+fun QrCodeButton(
+    modifier: Modifier,
+    onQrCodeScanned: (Int) -> Unit
+)
+{
+    var deviceID by remember { mutableIntStateOf(0) }
     val scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
         result.let {
             var qrData = result.toString()
             if(result is QRResult.QRUserCanceled) return@let
 
-            Log.d("RESULT_DATA", qrData)
-            packageHolderId = parseQrResult(qrData) ?: 0
+            deviceID = parseQrResult(qrData) ?: return@let
+            onQrCodeScanned(deviceID)
         }
     }
 
-    val modifier = Modifier
-        .padding(2.dp)
-        .fillMaxWidth()
-
     Box(
-        modifier = Modifier
-            //.weight(0.2f)
-            //.align(Alignment.CenterVertically)
+        modifier = modifier
     ) {
         IconButton(
             onClick = {
                 scanQRCodeLauncher.launch(null)
             },
             modifier = modifier
-                // .align(Alignment.CenterVertically)
+                .padding(2.dp)
                 .fillMaxHeight()
-                //.weight(0.2f)
                 .background(
                     TextFieldDefaults.colors().unfocusedContainerColor,
                     RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
@@ -72,10 +65,12 @@ fun QrCodeButton() {
                 )
             },
         )
-        TabRowDefaults.Divider(
-            color = Color.Black,
+        Divider(
+            color = TextFieldDefaults.colors().unfocusedIndicatorColor,
             thickness = 1.dp,
-            modifier = modifier
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(2.dp)
                 .align(Alignment.BottomCenter)
         )
     }
@@ -103,11 +98,5 @@ fun parseQrResult(qrData: String) : Int? {
         Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
     }
     return null
-}
-
-@Preview
-@Composable
-fun QrCodeButtonPreview() {
-    QrCodeButton()
 }
 

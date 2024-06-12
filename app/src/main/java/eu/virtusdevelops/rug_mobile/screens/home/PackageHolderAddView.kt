@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
@@ -49,8 +50,11 @@ import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import eu.virtusdevelops.rug_mobile.R
-import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.parseQrResult
 import eu.virtusdevelops.rug_mobile.viewModels.AddPackageHolderViewModel
+import eu.virtusdevelops.rug_mobile.modifiers.QrCodeButton
+import eu.virtusdevelops.rug_mobile.modifiers.parseQrResult
+import eu.virtusdevelops.rug_mobile.navigation.Screen
+import eu.virtusdevelops.rug_mobile.screens.GradientBackground
 import eu.virtusdevelops.rug_mobile.viewModels.PackageHolderListViewModel
 import io.github.g00fy2.quickie.QRResult
 import io.github.g00fy2.quickie.ScanQRCode
@@ -68,23 +72,11 @@ fun PackageHolderAddScreen(
 
     val isError = viewModel.isError.collectAsState()
 
-    val scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
-        result.let {
-            val qrData = result.toString()
-            if (result is QRResult.QRUserCanceled) return@let
-
-            Log.d("RESULT_DATA", qrData)
-            deviceID = (parseQrResult(qrData) ?: 0).toString()
-        }
-    }
-
-
     val context = LocalContext.current
     if (isError.value) {
         Toast.makeText(context, "Invalid package holder", Toast.LENGTH_SHORT).show()
         viewModel.clearErrorMessage()
     }
-
 
     val modifier = Modifier
         .fillMaxWidth()
@@ -115,7 +107,7 @@ fun PackageHolderAddScreen(
                     TextField(
                         value = deviceID.toString(),
                         onValueChange = {
-                            if(it.isDigitsOnly()){
+                            if (it.isDigitsOnly()) {
                                 deviceID = it
                             }
                         },
@@ -129,35 +121,11 @@ fun PackageHolderAddScreen(
                         leadingIcon = {
                             Icon(Icons.Filled.Info, contentDescription = "Username")
                         })
-                    Box(
-                        modifier = Modifier
-                            .weight(0.2f)
-                            .align(Alignment.CenterVertically)
-                    ) {
-                        IconButton(
-                            onClick = {
-                                scanQRCodeLauncher.launch(null)
-                            },
-                            modifier = modifier
-                                .fillMaxHeight()
-                                .background(
-                                    TextFieldDefaults.colors().unfocusedContainerColor,
-                                    RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
-                                ),
-                            content = {
-                                Icon(
-                                    modifier = Modifier.padding(10.dp),
-                                    imageVector = ImageVector.vectorResource(R.drawable.qrcode_solid),
-                                    contentDescription = "qr code scanner"
-                                )
-                            },
-                        )
-                        TabRowDefaults.Divider(
-                            color = Color.Black,
-                            thickness = 1.dp,
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                        )
+                    QrCodeButton(modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.2f)
+                        .align(Alignment.CenterVertically)) {
+                        deviceID = it.toString()
                     }
                 }
             }
