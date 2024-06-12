@@ -37,6 +37,8 @@ class SendPackageViewModel @Inject constructor(
 
     private val _errorMessage = MutableStateFlow("")
 
+    var errorMessage = _errorMessage.asStateFlow()
+
     val isError = _errorMessage
         .map {
             it.isNotEmpty()
@@ -64,7 +66,7 @@ class SendPackageViewModel @Inject constructor(
             when(result){
                 is Result.Error -> {
                     Log.e("PACKAGEHOLDER", "Failed getting package holder: ${result.error.name}")
-                    _errorMessage.value = result.error.name
+                    _errorMessage.value = "Invalid package holder"
                     _internalPackageHolderId.value = null
                 }
                 is Result.Success -> {
@@ -79,6 +81,22 @@ class SendPackageViewModel @Inject constructor(
 
     }
 
+    suspend fun getPackageHolder(id: Int){
+        val result = repository.getPackageHolder(id)
+
+        when(result){
+            is Result.Error -> {
+                Log.e("PACKAGEHOLDER", "Failed getting package holder: ${result.error.name}")
+                _errorMessage.value = "Invalid package holder"
+                _internalPackageHolderId.value = null
+            }
+            is Result.Success -> {
+                Log.i("PACKAGEHOLDER", "Got package holder: ${result.data.internalID}")
+                _internalPackageHolderId.value = result.data.internalID
+            }
+        }
+    }
+
     fun clearErrorMessage(){
         _errorMessage.value = ""
     }
@@ -87,7 +105,7 @@ class SendPackageViewModel @Inject constructor(
         email: String,
         firstName: String,
         lastName: String,
-        packageHolder: UUID,
+        packageHolder: String,
         streetAddress: String,
         houseNumber: String,
         postNumber: String,
@@ -100,12 +118,20 @@ class SendPackageViewModel @Inject constructor(
             isBusy = true
             _errorMessage.value = ""
 
+            getPackageHolder(packageHolder.toInt())
+
+            if(_internalPackageHolderId.value == null){
+                _errorMessage.value = "Invalid package holder";
+                return@launch
+            }
+
+
             when (val result = packagesRepository.addOutgoingPackage(
                 AddOutgoingPackageRequest(
                     email,
                     firstName,
                     lastName,
-                    packageHolder,
+                    _internalPackageHolderId.value!!,
                     streetAddress,
                     houseNumber,
                     city,
@@ -115,7 +141,7 @@ class SendPackageViewModel @Inject constructor(
                 )
             )) {
                 is Result.Error -> {
-                    _errorMessage.value = result.error.name;
+                    _errorMessage.value = "Something went wrong"
                     Log.d("ERROR", result.error.name)
                 }
 

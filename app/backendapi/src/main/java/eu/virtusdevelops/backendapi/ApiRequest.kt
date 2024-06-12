@@ -5,10 +5,12 @@ import eu.virtusdevelops.backendapi.requests.ChangeDeviceTokenRequest
 import eu.virtusdevelops.backendapi.requests.LoginRequest
 import eu.virtusdevelops.backendapi.requests.OpenPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.RegisterRequest
+import eu.virtusdevelops.backendapi.responses.DeliverPackageResponse
 import eu.virtusdevelops.backendapi.responses.LoginResponse
 import eu.virtusdevelops.backendapi.responses.OutgoingPackageResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
+import eu.virtusdevelops.backendapi.responses.PackagePickupResponse
 import eu.virtusdevelops.backendapi.responses.PackageVerifyResponse
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.PackageHolder
@@ -98,6 +100,26 @@ interface ApiRequest {
     @Headers("Content-Type: application/json")
     @POST("package/sendPackage")
     suspend fun sendPackage(@Body outgoingPackageData: AddOutgoingPackageRequest): Response<OutgoingPackageResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("package/{id}/claim")
+    suspend fun claimPackage(@Path("id") id: UUID): Response<PackagePickupResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("package/{id}/deliveryPickupScan")
+    suspend fun deliveryPickup(@Path("id") id: UUID): Response<PackagePickupResponse>
+
+
+    @Headers("Content-Type: application/json")
+    @POST("package/{id}/onRoute")
+    suspend fun deliveryOnRoute(@Path("id") id: UUID): Response<DeliveryPackage>
+
+
+
+    @Headers("Content-Type: application/json")
+    @POST("package/{id}/deliver")
+    suspend fun deliverPackage(@Path("id") id: UUID): Response<DeliverPackageResponse>
+
 
     /**
      * Call this to open package holder to deposit package

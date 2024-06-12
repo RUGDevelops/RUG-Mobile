@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,8 +44,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
@@ -75,6 +78,7 @@ fun SendPackageView(
     val packageHolderId by viewModel.internalPackageHolderId.collectAsState()
     val isBusy = viewModel.isBusy
     val isError = viewModel.isError.collectAsState()
+    val error = viewModel.errorMessage.collectAsState()
 
     val modifier = Modifier
         .padding(2.dp)
@@ -85,7 +89,7 @@ fun SendPackageView(
             val qrData = result.toString()
             if (result is QRResult.QRUserCanceled) return@let
             Log.d("RESULT_DATA", qrData)
-            viewModel.loadPackageHolder(parseQrResult(qrData))
+            packageHolder = (parseQrResult(qrData) ?: 0).toString()
         }
     }
 
@@ -93,7 +97,7 @@ fun SendPackageView(
 
 
     if (isError.value) {
-        Toast.makeText(context, "Invalid package holder", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, error.value, Toast.LENGTH_SHORT).show()
         viewModel.clearErrorMessage()
     }
 
@@ -154,12 +158,16 @@ fun SendPackageView(
                     modifier = Modifier.height(IntrinsicSize.Min)
                 ) {
                     TextField(
-                        value = packageHolderId.toString(),
-                        onValueChange = { packageHolder = it },
+                        value = packageHolder,
+                        onValueChange = {
+                            if(it.isDigitsOnly()){
+                                packageHolder = it
+                            }
+                        },
                         label = { Text("Package holder ID") },
                         modifier = modifier.weight(1f),
                         singleLine = true,
-                        enabled = false
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
                     Box(
                         modifier = Modifier
@@ -179,16 +187,11 @@ fun SendPackageView(
                                     RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)
                                 ),
                             content = {
-                                if (isBusy) {
-                                    CircularProgressIndicator()
-                                } else {
-                                    Icon(
-                                        modifier = Modifier.padding(10.dp),
-                                        imageVector = ImageVector.vectorResource(R.drawable.qrcode_solid),
-                                        contentDescription = "qr code scanner"
-                                    )
-                                }
-
+                                Icon(
+                                    modifier = Modifier.padding(10.dp),
+                                    imageVector = ImageVector.vectorResource(R.drawable.qrcode_solid),
+                                    contentDescription = "qr code scanner"
+                                )
                             },
                         )
                         HorizontalDivider(
@@ -254,17 +257,11 @@ fun SendPackageView(
                 Button(
                     shape = RoundedCornerShape(10.dp),
                     onClick = {
-                        if (packageHolderId == null) {
-                            Toast.makeText(context, "Invalid package holder", Toast.LENGTH_SHORT).show()
-                            viewModel.clearErrorMessage()
-                            return@Button
-                        }
-
                         viewModel.addOutgoingPackage(
                             email,
                             firstName,
                             lastName,
-                            packageHolderId!!,
+                            packageHolder,
                             streetAddress,
                             houseNumber,
                             postNumber,
