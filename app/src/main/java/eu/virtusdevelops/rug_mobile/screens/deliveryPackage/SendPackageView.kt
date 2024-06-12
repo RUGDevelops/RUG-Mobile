@@ -62,15 +62,15 @@ fun SendPackageView(
     paddingValues: PaddingValues,
 ) {
     val viewModel = hiltViewModel<SendPackageViewModel>()
-    var email by remember { mutableStateOf("rene.jausovec1@student.um.si") }
-    var firstName by remember { mutableStateOf("Rene") }
-    var lastName by remember { mutableStateOf("Jausovec") }
-    var packageHolder by remember { mutableStateOf("e9a13c34-ce75-4319-b0ed-bc5d91b28074") }
-    var streetAddress by remember { mutableStateOf("Random") }
-    var houseNumber by remember { mutableStateOf("30") }
-    var postNumber by remember { mutableStateOf("2000") }
-    var city by remember { mutableStateOf("Maribor") }
-    var country by remember { mutableStateOf("Slovenia") }
+    var email by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var packageHolder by remember { mutableStateOf("") }
+    var streetAddress by remember { mutableStateOf("") }
+    var houseNumber by remember { mutableStateOf("") }
+    var postNumber by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var country by remember { mutableStateOf("") }
 
     val packageHolderId by viewModel.internalPackageHolderId.collectAsState()
     val isBusy = viewModel.isBusy

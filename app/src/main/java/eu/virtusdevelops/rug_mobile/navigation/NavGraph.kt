@@ -25,6 +25,7 @@ import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.OutgoingPackageView
 import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.SendPackageView
 import eu.virtusdevelops.rug_mobile.screens.home.OutgoingPackageListView
 import eu.virtusdevelops.rug_mobile.screens.home.IncomingPackageListView
+import eu.virtusdevelops.rug_mobile.screens.home.PackageHolderAddScreen
 import java.util.UUID
 
 @Composable
@@ -82,6 +83,9 @@ fun NavGraphBuilder.packagesNavGraph(navController: NavHostController, innerPadd
 
         composable(Screen.SendPackage.route){
             SendPackageView(navController = navController, paddingValues = innerPadding)
+        }
+        composable(Screen.AddPackageHolderScreen.route) {
+            PackageHolderAddScreen(navController = navController)
         }
 
 

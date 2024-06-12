@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -29,9 +30,11 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -91,40 +94,57 @@ fun PackageHoldersScreen(
         onRefresh = { packageHolderViewModel.load() }
     )
 
-    Box(
-        modifier = Modifier.pullRefresh(refreshState)
-            .padding(innerPaddingValues)
-    ){
-        Column(
+    Scaffold(
+
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.AddPackageHolderScreen.route)
+                },
+                modifier = Modifier.padding(innerPaddingValues)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Send")
+            }
+        }
+    )
+    { padding ->
+        Box(
             modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .pullRefresh(refreshState)
+                .padding(innerPaddingValues)
         ) {
-            if (isBusy) {
-                CircularProgressIndicator()
-            } else if (isError) {
-                Text(text = "An error occurred. Please try again.")
-            } else {
-                if(packageHolders.isEmpty()){
-                    Text(text = "No package holders found.")
-                }else{
-                    ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (isBusy) {
+                    CircularProgressIndicator()
+                } else if (isError) {
+                    Text(text = "An error occurred. Please try again.")
+                } else {
+                    if (packageHolders.isEmpty()) {
+                        Text(text = "No package holders found.")
+                    } else {
+                        ListOfPackageHolders(navController, packageHolderViewModel, packageHolders)
+                    }
                 }
             }
         }
-    }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .pullRefresh(refreshState),
-        contentAlignment = Alignment.TopCenter){
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .pullRefresh(refreshState),
+            contentAlignment = Alignment.TopCenter
+        ) {
 
-        PullRefreshIndicator(
-            refreshing = isBusy,
-            state = refreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
+            PullRefreshIndicator(
+                refreshing = isBusy,
+                state = refreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
     }
 
 }
