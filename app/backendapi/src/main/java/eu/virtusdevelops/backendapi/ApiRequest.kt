@@ -71,10 +71,6 @@ interface ApiRequest {
 
 
     @Headers("Content-Type: application/json")
-    @GET("package_holder/{id}")
-    suspend fun getPackageHolderData(@Path("id") id: Int): Response<PackageHolder>
-
-    @Headers("Content-Type: application/json")
     @GET("package_holder/{id}/history")
     suspend fun getPackageHolderWithHistory(@Path("id") id: Int): Response<PackageHolderWithHistoryResponse>
 
@@ -104,6 +100,11 @@ interface ApiRequest {
     @Headers("Content-Type: application/json")
     @POST("package/{id}/claim")
     suspend fun claimPackage(@Path("id") id: UUID): Response<PackagePickupResponse>
+
+
+    @Headers("Content-Type: application/json")
+    @POST("package_holder/{package_holder}/claim")
+    suspend fun claimPackageByPackageHolder(@Path("package_holder") id: Int): Response<PackagePickupResponse>
 
     @Headers("Content-Type: application/json")
     @POST("package/{id}/deliveryPickupScan")

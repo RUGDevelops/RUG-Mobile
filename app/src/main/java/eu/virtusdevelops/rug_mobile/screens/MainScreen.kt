@@ -1,16 +1,17 @@
 package eu.virtusdevelops.rug_mobile.screens
 
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
+import android.media.MediaPlayer
+import android.util.Base64
+import android.widget.Toast
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,11 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,53 +40,33 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import eu.virtusdevelops.rug_mobile.R
+import eu.virtusdevelops.rug_mobile.modifiers.FloatingQRButton
 import eu.virtusdevelops.rug_mobile.navigation.AuthGraph
 import eu.virtusdevelops.rug_mobile.navigation.Screen
 import eu.virtusdevelops.rug_mobile.navigation.SetupNavGraph
 import eu.virtusdevelops.rug_mobile.ui.theme.RUGMobileTheme
-import eu.virtusdevelops.rug_mobile.viewModels.UserViewModel
-import io.github.g00fy2.quickie.QRResult
-import io.github.g00fy2.quickie.ScanQRCode
+import eu.virtusdevelops.rug_mobile.viewModels.PackageScanViewModel
+import java.io.File
+import java.io.FileOutputStream
+import java.util.zip.ZipInputStream
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterialApi::class
-)
 @Composable
 fun MainScreen(
     navController: NavHostController = rememberNavController()
 ) {
-    // maybe convert main screen to use nested navigation, to seperate packageholders screen and packages screen?
 
 
-//    var viewModel = LocalUserState.current
-    var presses by remember { mutableIntStateOf(0) }
-    val scanQRCodeLauncher = rememberLauncherForActivityResult(ScanQRCode()) { result ->
-        result.let {
-            var qrData = result.toString()
-            if(result is QRResult.QRUserCanceled) return@let
-
-            Log.d("RESULT_DATA", qrData)
-            parseQrResult(qrData)
-        }
-    }
-
-    val viewModel = hiltViewModel<UserViewModel>()
-
+    val viewModel = hiltViewModel<PackageScanViewModel>()
 
 
 
     Scaffold(
         topBar = {
-            TopNavBar(navController, viewModel)
+            TopNavBar(navController)
         },
         floatingActionButton = {
-            FloatingBar(navController = navController)
+            FloatingBar(navController = navController, viewModel)
         },
-//        floatingActionButton = {
-//            FloatingActionButton(onClick = { presses++ }) {
-//                Icon(Icons.Default.Add, contentDescription = "Send")
-//            }
-//        }
         bottomBar = {
             BottomBar(navController = navController)
         }
@@ -98,10 +79,25 @@ fun MainScreen(
 
 
 @Composable
-fun FloatingBar(navController: NavController){
+fun FloatingBar(navController: NavController, viewModel: PackageScanViewModel){
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    val isBusy by remember {
+        viewModel::isBusy
+    }
+
+
+    val isError = viewModel.isError.collectAsState()
+    val context = LocalContext.current
+
+    if (isError.value) {
+        Toast.makeText(context, viewModel.errorMessage.collectAsState().value, Toast.LENGTH_SHORT).show()
+        viewModel.clearErrorMessage()
+    }
+
+
 
     if(currentDestination?.route == Screen.PackagesOutListScreen.route){
         androidx.compose.material3.FloatingActionButton(
@@ -120,18 +116,27 @@ fun FloatingBar(navController: NavController){
             Icon(Icons.Default.Add, contentDescription = "Add")
         }
     }else if(currentDestination?.route == Screen.PackagesInListScreen.route){
-        androidx.compose.material3.FloatingActionButton(
-            onClick = {
-                navController.navigate(Screen.AddPackageHolderScreen.route)
-            },
-        ) {
-            Icon(
-                painterResource(id = R.drawable.qrcode_solid),
-                modifier = Modifier
-                    .width(32.dp)
-                    .height(32.dp),
-                contentDescription = "Claim")
+        if(isBusy){
+
+            androidx.compose.material3.FloatingActionButton(
+                onClick = {
+
+                },
+            ) {
+                CircularProgressIndicator()
+            }
+
+
+        }else{
+            FloatingQRButton(modifier = Modifier) {
+                viewModel.claimPackage(it) {sound ->
+
+                    // play sound
+                    playBase64Wav(sound)
+                }
+            }
         }
+
     }
 
 }
@@ -188,7 +193,7 @@ fun BottomBar(navController: NavHostController) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopNavBar(navController: NavHostController, viewModel: UserViewModel){
+fun TopNavBar(navController: NavHostController){
 
     val screens = listOf(
         Screen.PackageHoldersScreen,
@@ -287,41 +292,31 @@ fun CustomTopbar(title: String, navController: NavController){
 }
 
 
+private fun playBase64Wav(base64Wav: String) {
+    // Decode the Base64 string to a byte array
+    val decodedWav = Base64.decode(base64Wav, Base64.DEFAULT)
 
+    // Write the byte array to a temporary .zip file
+    val tempZipFile = File.createTempFile("temp", ".zip")
+    val fos = FileOutputStream(tempZipFile)
+    fos.write(decodedWav)
+    fos.close()
 
+    // Unzip the .zip file to extract the .wav file
+    val zis = ZipInputStream(tempZipFile.inputStream())
+    val entry = zis.nextEntry
+    val tempWavFile = File.createTempFile("temp", ".wav")
+    tempWavFile.outputStream().use { it.write(zis.readBytes()) }
 
-private fun parseQrResult(qrData: String) {
-    if(qrData.isEmpty()) return
-    val rawValueStartIndex = qrData.indexOf("rawValue=") + "rawValue=".length
-    val rawValueEndIndex = qrData.indexOf(")", startIndex = rawValueStartIndex)
-    val rawValue = qrData.substring(rawValueStartIndex, rawValueEndIndex)
-
-    val components = rawValue.split(",")
-
-    if (components.size == 3) {
-        val url = components[0]
-        val urlComponents = url.split("/")
-
-        if (urlComponents.size >= 11) {
-            val deliveryId = urlComponents[3].toIntOrNull() ?: 0
-            val boxId = urlComponents[4].toIntOrNull() ?: 0
-            val tokenFormat = urlComponents[5].toIntOrNull() ?: 0
-            val latitude = urlComponents[6].toIntOrNull() ?: 0
-            val longitude = urlComponents[7].toIntOrNull() ?: 0
-            val terminalSeed = urlComponents[8].toIntOrNull() ?: 0
-            val doorIndex = urlComponents[9].toIntOrNull() ?: 0
-
-            for (component in urlComponents) {
-                Log.d("URL_COMPONENT", component)
-            }
-
-        } else {
-            Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
-        }
-    } else {
-        Log.d("QR_ERROR", "Failed to parse QR code data: $qrData")
+    // Use a MediaPlayer to play the .wav file
+    val mediaPlayer = MediaPlayer()
+    mediaPlayer.setDataSource(tempWavFile.absolutePath)
+    mediaPlayer.prepareAsync()
+    mediaPlayer.setOnPreparedListener {
+        it.start()
     }
 }
+
 
 @Preview
 @Composable

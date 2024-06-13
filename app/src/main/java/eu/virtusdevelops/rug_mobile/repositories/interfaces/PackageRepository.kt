@@ -17,4 +17,5 @@ interface PackageRepository {
     suspend fun claimPackage(packageID: UUID): Result<String, DataError.Network> // returns sound
     suspend fun deliveryPickup(packageID: UUID): Result<String, DataError.Network> // returns sound
     suspend fun setOnRoute(packageID: UUID): Result<DeliveryPackage, DataError.Network>
+    suspend fun claimPackageWithPackageHolderId(packageholderId: Int): Result<String, DataError.Network>
 }
