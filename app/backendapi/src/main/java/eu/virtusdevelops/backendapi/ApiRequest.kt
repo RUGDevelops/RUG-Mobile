@@ -1,4 +1,5 @@
 package eu.virtusdevelops.backendapi
+
 import eu.virtusdevelops.backendapi.requests.AddOutgoingPackageRequest
 import eu.virtusdevelops.backendapi.requests.AddPackageHolderRequest
 import eu.virtusdevelops.backendapi.requests.ChangeDeviceTokenRequest
@@ -12,14 +13,13 @@ import eu.virtusdevelops.backendapi.responses.PackageHolderOpenResponse
 import eu.virtusdevelops.backendapi.responses.PackageHolderWithHistoryResponse
 import eu.virtusdevelops.backendapi.responses.PackagePickupResponse
 import eu.virtusdevelops.backendapi.responses.PackageVerifyResponse
-import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.datalib.models.PackageHolder
 import eu.virtusdevelops.datalib.models.SessionInformation
 import eu.virtusdevelops.datalib.models.User
+import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
-
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -71,10 +71,6 @@ interface ApiRequest {
 
 
     @Headers("Content-Type: application/json")
-    @GET("package_holder/{id}")
-    suspend fun getPackageHolderData(@Path("id") id: Int): Response<PackageHolder>
-
-    @Headers("Content-Type: application/json")
     @GET("package_holder/{id}/history")
     suspend fun getPackageHolderWithHistory(@Path("id") id: Int): Response<PackageHolderWithHistoryResponse>
 
@@ -104,6 +100,11 @@ interface ApiRequest {
     @Headers("Content-Type: application/json")
     @POST("package/{id}/claim")
     suspend fun claimPackage(@Path("id") id: UUID): Response<PackagePickupResponse>
+
+
+    @Headers("Content-Type: application/json")
+    @POST("package_holder/{package_holder}/claim")
+    suspend fun claimPackageByPackageHolder(@Path("package_holder") id: Int): Response<PackagePickupResponse>
 
     @Headers("Content-Type: application/json")
     @POST("package/{id}/deliveryPickupScan")

@@ -1,6 +1,5 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,12 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import eu.virtusdevelops.backendapi.requests.AddOutgoingPackageRequest
 import eu.virtusdevelops.datalib.models.deliveryPackage.DeliveryPackage
 import eu.virtusdevelops.rug_mobile.domain.Result
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
 
 

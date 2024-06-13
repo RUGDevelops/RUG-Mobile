@@ -18,7 +18,6 @@ import eu.virtusdevelops.rug_mobile.domain.Result
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.PackageRepository
 import kotlinx.coroutines.launch
 import java.util.UUID
-import javax.inject.Inject
 
 
 @HiltViewModel(assistedFactory = PackageViewModel.PackageViewModelFactory::class)

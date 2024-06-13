@@ -1,6 +1,5 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
-import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +12,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import eu.virtusdevelops.datalib.models.SessionInformation
 import eu.virtusdevelops.rug_mobile.domain.Result
 import eu.virtusdevelops.rug_mobile.repositories.interfaces.SessionRepository
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject

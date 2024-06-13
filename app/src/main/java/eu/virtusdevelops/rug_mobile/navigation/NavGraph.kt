@@ -12,20 +12,20 @@ import androidx.navigation.navArgument
 import eu.virtusdevelops.rug_mobile.screens.CameraPreviewScreen
 import eu.virtusdevelops.rug_mobile.screens.SettingsScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.ActiveSessionsList
-import eu.virtusdevelops.rug_mobile.screens.auth.FaceLoginScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.ChangePasswordScreen
-import eu.virtusdevelops.rug_mobile.screens.auth.SplashScreen
+import eu.virtusdevelops.rug_mobile.screens.auth.FaceLoginScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.LoginScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.PendingSessionsList
-import eu.virtusdevelops.rug_mobile.screens.home.PackageHolderScreen
-import eu.virtusdevelops.rug_mobile.screens.home.PackageHoldersScreen
 import eu.virtusdevelops.rug_mobile.screens.auth.RegisterScreen
+import eu.virtusdevelops.rug_mobile.screens.auth.SplashScreen
 import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.IncomingPackageView
 import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.OutgoingPackageView
 import eu.virtusdevelops.rug_mobile.screens.deliveryPackage.SendPackageView
-import eu.virtusdevelops.rug_mobile.screens.home.OutgoingPackageListView
 import eu.virtusdevelops.rug_mobile.screens.home.IncomingPackageListView
+import eu.virtusdevelops.rug_mobile.screens.home.OutgoingPackageListView
 import eu.virtusdevelops.rug_mobile.screens.home.PackageHolderAddScreen
+import eu.virtusdevelops.rug_mobile.screens.home.PackageHolderScreen
+import eu.virtusdevelops.rug_mobile.screens.home.PackageHoldersScreen
 import java.util.UUID
 
 @Composable

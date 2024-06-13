@@ -1,6 +1,5 @@
 package eu.virtusdevelops.rug_mobile.viewModels
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue

@@ -57,8 +57,6 @@ class PackageHolderListViewModel @Inject constructor(
 
     fun getOpenSound(id: Int, onSuccess: () -> Unit){
         openSound = ""
-//        isBusy = true
-
         viewModelScope.launch(Dispatchers.IO) {
             isLoadingSound = true
 
@@ -68,15 +66,13 @@ class PackageHolderListViewModel @Inject constructor(
                         openSound = result.data
                         onSuccess()
                     }
-
                 }
                 is Result.Error -> {
 
                 }
             }
-
             viewModelScope.launch {
-                isLoadingSound = true
+                isLoadingSound = false
             }
         }
     }
